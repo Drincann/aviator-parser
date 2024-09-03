@@ -1,4 +1,3 @@
-import { Statement } from "typescript"
 import { Lexer, Token, TokenType } from "./lexer.js"
 
 export type StatementNode = {
@@ -63,7 +62,7 @@ export type FunctionCall = {
   arguments: ExpressionNode[]
 }
 
-export class AviatorExpressionParser {
+export class AviatorParser {
   private lexer: Lexer
   private currentToken?: Token
   constructor(code: string) { this.lexer = new Lexer(code) }

@@ -1,11 +1,11 @@
 import { describe, it } from "node:test"
 import assert from 'assert/strict'
-import { AviatorExpressionParser } from "../src/parser.js"
+import { AviatorParser } from "../src/parser.js"
 
 describe("parser", () => {
   it("logic or", () => {
     const exp = `deviceId == 'EA2BE91A-2790-45B5-BB1C-229B6AC09366' || deviceId == '24680522-11B0-4ED3-8CEE-5288D5701E88' || deviceId == '401D60F4-94CC-491C-AC03-7EFB0F7FA80B' || deviceId == '8FB189B3-E38D-4130-98CF-703AA24629D4' || deviceId == 'BAEC7EBA-1E07-4A29-AC02-7EBAC61998BA' || deviceId == '74056989-DC8E-43BF-B96E-CEBFD6BD5D47'`
-    const parser = new AviatorExpressionParser(exp)
+    const parser = new AviatorParser(exp)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
@@ -88,7 +88,7 @@ describe("parser", () => {
 
   it("logic and with comment", () => {
     const exp = `R_IAPRiskUserHigh==1&&business!='WEB'&&platform=='ios'## && channel=='APPLE_IAP' ## && business=='CASH_WALLET'`
-    const parser = new AviatorExpressionParser(exp)
+    const parser = new AviatorParser(exp)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
@@ -123,7 +123,7 @@ describe("parser", () => {
 
   it("logic and & or", () => {
     const exp = `R_IAPRiskUserHigh==1&&business!='WEB'&&platform=='ios'||channel=='APPLE_IAP'&&business=='CASH_WALLET'`
-    const parser = new AviatorExpressionParser(exp)
+    const parser = new AviatorParser(exp)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
@@ -178,7 +178,7 @@ describe("parser", () => {
 
   it("binary expression & unary expression", () => {
     const exp = `R_IAPRiskUserHigh==1&&!isXxx!=true`
-    const parser = new AviatorExpressionParser(exp)
+    const parser = new AviatorParser(exp)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
@@ -203,7 +203,7 @@ describe("parser", () => {
 
   it("regex", () => {
     const exp = `(isVirtualPhone4Shield == 1 || phoneNumberNew =~ /86192.*/) && build < 7330000 && isUserRecentRegister72hour == 1`
-    const parser = new AviatorExpressionParser(exp)
+    const parser = new AviatorParser(exp)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
@@ -248,7 +248,7 @@ describe("parser", () => {
 
   it("function call", () => {
     const exp = `string.contains(tinyAccessibilityServices,"com.wtkj.app.clicker")`
-    const parser = new AviatorExpressionParser(exp)
+    const parser = new AviatorParser(exp)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
@@ -266,7 +266,7 @@ describe("parser", () => {
 
   it("ternary expression", () => {
     const exp = `(userAccountPhoneNumberPlus != nil ? yongAnPhoneRiskNewUserAccount == "" : false)`
-    const parser = new AviatorExpressionParser(exp)
+    const parser = new AviatorParser(exp)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
@@ -291,7 +291,7 @@ describe("parser", () => {
 
   it("statements", () => {
     const code = `isUsedFreqCityIp;isTruthfulDevice;isBuildNotMiniUaAppBuild==1&&userId!=''&&deviceId!=''`
-    const parser = new AviatorExpressionParser(code)
+    const parser = new AviatorParser(code)
     const root = parser.parse()
     assertAssignable(root, [{
       type: 'statement',
