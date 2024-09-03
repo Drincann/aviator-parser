@@ -244,6 +244,28 @@ describe("parser", () => {
       ]
     })
   })
+
+  it("ternary expression", () => {
+    const exp = `(userAccountPhoneNumberPlus != nil ? yongAnPhoneRiskNewUserAccount == "" : false)`
+    const parser = new AviatorExpressionParser(exp)
+    const root = parser.parse()
+    assertAssignable(root, {
+      type: 'ternary-expression',
+      test: {
+        type: 'binary-expression',
+        left: { type: 'identifier', name: 'userAccountPhoneNumberPlus' },
+        operator: 'NotEqual',
+        right: { type: 'nil-literal' }
+      },
+      consequent: {
+        type: 'binary-expression',
+        left: { type: 'identifier', name: 'yongAnPhoneRiskNewUserAccount' },
+        operator: 'Equal',
+        right: { type: 'string-literal', value: '' }
+      },
+      alternate: { type: 'boolean-literal', value: false }
+    })
+  })
 })
 
 function assertAssignable(obj: Record<string, any>, isAssignableTo: Record<string, any>, path = '$') {

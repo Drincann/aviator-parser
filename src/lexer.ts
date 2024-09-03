@@ -18,11 +18,14 @@ type TokenValueType<TokenTypeGeneric extends TokenType> =
   TokenTypeGeneric extends 'Number' ? number :
   TokenTypeGeneric extends 'String' ? string :
   TokenTypeGeneric extends 'Regex' ? string :
+  TokenTypeGeneric extends 'True' ? 'true' :
+  TokenTypeGeneric extends 'False' ? 'false' :
+  TokenTypeGeneric extends 'Nil' ? 'nil' :
   TokenTypeGeneric extends 'Comment' ? string :
   undefined
 
 export type TokenType =
-  | 'Identifier' | 'Number' | 'String' | 'True' | 'False' | 'Regex'
+  | 'Identifier' | 'Number' | 'String' | 'Regex' | 'True' | 'False' | 'Nil'
   | 'Add' | 'Subtract' | 'Multiply' | 'Divide' | 'Mod'
   | 'Like' | 'Equal' | 'NotEqual' | 'LessThan' | 'LessThanEqual' | 'GreaterThan' | 'GreaterThanEqual' | 'LogicOr' | 'LogicAnd' | 'LogicNot'
   | 'LeftParen' | 'RightParen'
@@ -121,7 +124,7 @@ export class Lexer {
     this.until(new Set(['\n', '\0']))
   }
 
-  private parseNextIdentifier(): Token<'Identifier' | 'True' | 'False'> | undefined {
+  private parseNextIdentifier(): Token<'Identifier' | 'True' | 'False' | 'Nil'> | undefined {
     const start = this.cursor - 1
 
     let end = this.cursor
@@ -139,6 +142,7 @@ export class Lexer {
     const name = this.code.substring(start, end)
     if (name === 'true') return { type: 'True', value: 'true' }
     else if (name === 'false') return { type: 'False', value: 'false' }
+    else if (name === 'nil') return { type: 'Nil', value: 'nil' }
     return { type: 'Identifier', value: name, }
   }
 

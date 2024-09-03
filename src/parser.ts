@@ -1,6 +1,11 @@
 import { Lexer, Token, TokenType } from "./lexer.js"
 
 export type ExpressionNode = {
+  type: 'ternary-expression',
+  test: ExpressionNode,
+  consequent: ExpressionNode,
+  alternate: ExpressionNode
+} | {
   type: 'binary-expression',
   left: ExpressionNode,
   right: ExpressionNode,
@@ -9,8 +14,7 @@ export type ExpressionNode = {
   type: 'unary-expression',
   argument: ExpressionNode,
   operator: UnaryOperator
-
-} | RegexLiteral | StringLiteral | NumberLiteral | BooleanLiteral | Identifier | FunctionCall
+} | RegexLiteral | StringLiteral | NumberLiteral | BooleanLiteral | NilLiteral | Identifier | FunctionCall
 
 export type BinaryOperator =
   | 'Add' | 'Subtract' | 'Multiply' | 'Divide' | 'Mod'
@@ -36,6 +40,10 @@ export type NumberLiteral = {
 export type BooleanLiteral = {
   type: 'boolean-literal',
   value: boolean
+}
+
+export type NilLiteral = {
+  type: 'nil-literal'
 }
 
 export type Identifier = {
@@ -73,6 +81,14 @@ export class AviatorExpressionParser {
         operator: operator!.type as BinaryOperator,
         right: this.parseExpression(getPriority(operator!.type))
       }
+
+      if (this.tryMatch('Conditional')) {
+        const test = left
+        const consequent = this.parseExpression(getPriority('Conditional'))
+        this.match('Colon')
+        const alternate = this.parseExpression(getPriority('Colon'))
+        return { type: 'ternary-expression', test, consequent, alternate }
+      }
     }
 
     return left as ExpressionNode
@@ -97,6 +113,9 @@ export class AviatorExpressionParser {
     } else if (this.currentToken?.type === 'False') {
       this.match('False')
       return { type: 'boolean-literal', value: false }
+    } else if (this.currentToken?.type === 'Nil') {
+      this.match('Nil')
+      return { type: 'nil-literal' }
     } else if (this.currentToken?.type === 'Identifier') {
       const name = this.currentToken.value as string
       this.match('Identifier')
@@ -174,7 +193,7 @@ function getPriority(type: TokenType): number {
     case 'Equal': case 'NotEqual': case 'Like': return 10
     case 'LogicAnd': return 9
     case 'LogicOr': return 8
-    case 'Conditional': return 7
+    case 'Conditional': case 'Colon': return 7
     default: throw new Error('Unknown operator: ' + type)
   }
 }
