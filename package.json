@@ -6,6 +6,7 @@
     "require": "./dist/cjs/index.js",
     "import": "./dist/esm/index.js"
   },
+  "typings": "src/index.ts",
   "scripts": {
     "test": "node --import=tsx --test ./test/*.test.ts",
     "build": "npm run build:esm && npm run build:cjs",
