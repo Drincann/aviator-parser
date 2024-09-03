@@ -21,6 +21,10 @@
     "url": "https://codingfor.life"
   },
   "license": "WTFPL",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Drincann/aviator-parser"
+  },
   "type": "module",
   "description": "",
   "devDependencies": {
