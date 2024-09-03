@@ -1,7 +1,7 @@
 import {
   parseDec, parseHex, parseOct, isDigitWithUnderscore, isDigit,
   isOctDigitWithUnderscore, isOctDigit, isHexDigitWithUnderscore,
-  isHexDigit, isIdentifierStart, isNumberLiteralStart, isIdentifier,
+  isHexDigit, isIdentifierStart, isNumberLiteralStart, isIdentifierChar,
   isEOF, isStringLiteralStart, getEscape, isDoubleQuote, isSingleQuote,
   isNotEOL, isNotEOF,
   isRegexLiteralStart
@@ -126,10 +126,14 @@ export class Lexer {
 
     let end = this.cursor
     let current = this.code[end]
-    while (isIdentifier(current)) {
+    while (isIdentifierChar(current)) {
       end++
+      if (this.code[end] === '.' && this.code[end + 1] === '.') {
+        throw new Error("lexer error, invalid object access syntax")
+      }
       current = this.code[end]
     }
+
     this.cursor = end
 
     const name = this.code.substring(start, end)

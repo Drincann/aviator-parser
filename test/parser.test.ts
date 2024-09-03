@@ -232,12 +232,12 @@ describe("parser", () => {
   })
 
   it("function call", () => {
-    const exp = `contains(tinyAccessibilityServices,"com.wtkj.app.clicker")`
+    const exp = `string.contains(tinyAccessibilityServices,"com.wtkj.app.clicker")`
     const parser = new AviatorExpressionParser(exp)
     const root = parser.parse()
     assertAssignable(root, {
       type: 'function-call',
-      name: 'contains',
+      name: 'string.contains',
       arguments: [
         { type: 'identifier', name: 'tinyAccessibilityServices' },
         { type: 'string-literal', value: 'com.wtkj.app.clicker' }

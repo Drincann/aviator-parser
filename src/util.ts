@@ -54,8 +54,8 @@ export function isIdentifierStart(char: string) {
   return isAlpha(char) || char === '_'
 }
 
-export function isIdentifier(char: string) {
-  return isAlpha(char) || isDigit(char) || char === '_'
+export function isIdentifierChar(char: string) {
+  return isAlpha(char) || isDigit(char) || char === '_' || char === '.'
 }
 
 export function isAlpha(char: string) {
