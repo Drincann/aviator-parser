@@ -1,0 +1,24 @@
+{
+  "name": "aviator-parser",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "node --import=tsx --test ./test/*.test.ts",
+    "build": "tsc src --outDir dist"
+  },
+  "keywords": [
+    "aviator"
+  ],
+  "author": {
+    "email": "devgaolihai@foxmail.com",
+    "name": "drincann",
+    "url": "https://codingfor.life"
+  },
+  "license": "WTFPL",
+  "type": "module",
+  "description": "",
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}
