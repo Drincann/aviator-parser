@@ -1,4 +1,10 @@
+import { Statement } from "typescript"
 import { Lexer, Token, TokenType } from "./lexer.js"
+
+export type StatementNode = {
+  type: 'statement',
+  expression: ExpressionNode
+}
 
 export type ExpressionNode = {
   type: 'ternary-expression',
@@ -61,9 +67,22 @@ export class AviatorExpressionParser {
   private lexer: Lexer
   private currentToken?: Token
   constructor(code: string) { this.lexer = new Lexer(code) }
-  public parse(): ExpressionNode {
+  public parse(): StatementNode[] {
     this.next()
-    return this.parseExpression()
+    return this.parseStatements()
+  }
+
+  private parseStatements(): StatementNode[] {
+    const statements: StatementNode[] = []
+    while (this.currentToken !== undefined) {
+      if (this.currentToken?.type === 'Semicolon') {
+        this.next()
+        continue
+      }
+
+      statements.push({ type: 'statement', expression: this.parseExpression() })
+    }
+    return statements
   }
 
   private parseExpression(priority: number = 0): ExpressionNode {

@@ -32,6 +32,7 @@ export type TokenType =
   | 'Conditional'
   | 'Colon'
   | 'Comma'
+  | 'Semicolon'
 
 export class Lexer {
   private code: string
@@ -69,6 +70,7 @@ export class Lexer {
       if (current === ')') return { type: 'RightParen', value: undefined, }
       if (current === '?') return { type: 'Conditional', value: undefined, }
       if (current === ':') return { type: 'Colon', value: undefined, }
+      if (current === ';') return { type: 'Semicolon', value: undefined, }
       if (current === ',') return { type: 'Comma', value: undefined, }
 
       if (current === '=') {
