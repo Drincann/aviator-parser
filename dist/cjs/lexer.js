@@ -28,6 +28,8 @@ var Lexer = /** @class */ (function () {
                 return this.parseNextNumberLiteral();
             if ((0, util_js_1.isStringLiteralStart)(current))
                 return this.parseNextStringLiteral();
+            if ((0, util_js_1.isRegexLiteralStart)(current))
+                return this.parseNextRegexLiteral();
             if (current === '+')
                 return { type: 'Add', value: undefined, };
             if (current === '-')
@@ -42,12 +44,18 @@ var Lexer = /** @class */ (function () {
                 return { type: 'Conditional', value: undefined, };
             if (current === ':')
                 return { type: 'Colon', value: undefined, };
+            if (current === ';')
+                return { type: 'Semicolon', value: undefined, };
             if (current === ',')
                 return { type: 'Comma', value: undefined, };
             if (current === '=') {
                 if (this.code[this.cursor] === '=') {
                     this.cursor++;
                     return { type: 'Equal', value: undefined, };
+                }
+                else if (this.code[this.cursor] === '~') {
+                    this.cursor++;
+                    return { type: 'Like', value: undefined, };
                 }
             }
             if (current === '!') {
@@ -96,8 +104,11 @@ var Lexer = /** @class */ (function () {
         var start = this.cursor - 1;
         var end = this.cursor;
         var current = this.code[end];
-        while ((0, util_js_1.isIdentifier)(current)) {
+        while ((0, util_js_1.isIdentifierChar)(current)) {
             end++;
+            if (this.code[end] === '.' && this.code[end + 1] === '.') {
+                throw new Error("lexer error, invalid object access syntax");
+            }
             current = this.code[end];
         }
         this.cursor = end;
@@ -106,6 +117,8 @@ var Lexer = /** @class */ (function () {
             return { type: 'True', value: 'true' };
         else if (name === 'false')
             return { type: 'False', value: 'false' };
+        else if (name === 'nil')
+            return { type: 'Nil', value: 'nil' };
         return { type: 'Identifier', value: name, };
     };
     Lexer.prototype.parseNextNumberLiteral = function () {
@@ -183,6 +196,21 @@ var Lexer = /** @class */ (function () {
             return this.parseStringLiteral(start);
         }
         throw new Error("lexer error, invalid string literal");
+    };
+    Lexer.prototype.parseNextRegexLiteral = function () {
+        var start = this.cursor - 1;
+        var cursor = start + 1;
+        var current = this.code[cursor];
+        var literal = '';
+        while (current !== '/' && (0, util_js_1.isNotEOL)(current)) {
+            literal += current;
+            current = this.code[++cursor];
+        }
+        if (current !== '/') {
+            throw new Error("lexer error, unterminated regex literal");
+        }
+        this.cursor = cursor + 1;
+        return { type: 'Regex', value: literal };
     };
     /**
      * @param start the position of the first double quote

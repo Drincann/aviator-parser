@@ -42,8 +42,8 @@ export function isNotEOF(char) {
 export function isIdentifierStart(char) {
     return isAlpha(char) || char === '_';
 }
-export function isIdentifier(char) {
-    return isAlpha(char) || isDigit(char) || char === '_';
+export function isIdentifierChar(char) {
+    return isAlpha(char) || isDigit(char) || char === '_' || char === '.';
 }
 export function isAlpha(char) {
     return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z');
@@ -77,6 +77,9 @@ export function isDecLiteralStart(char) {
 }
 export function isStringLiteralStart(current) {
     return current === '"' || current === "'";
+}
+export function isRegexLiteralStart(current) {
+    return current === '/';
 }
 export function getCurrentLine(code, cursor) {
     if (cursor === undefined) {

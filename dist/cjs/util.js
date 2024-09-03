@@ -6,7 +6,7 @@ exports.parseHex = parseHex;
 exports.isEOF = isEOF;
 exports.isNotEOF = isNotEOF;
 exports.isIdentifierStart = isIdentifierStart;
-exports.isIdentifier = isIdentifier;
+exports.isIdentifierChar = isIdentifierChar;
 exports.isAlpha = isAlpha;
 exports.isDigit = isDigit;
 exports.decNumber = decNumber;
@@ -18,6 +18,7 @@ exports.isOctDigitWithUnderscore = isOctDigitWithUnderscore;
 exports.isNumberLiteralStart = isNumberLiteralStart;
 exports.isDecLiteralStart = isDecLiteralStart;
 exports.isStringLiteralStart = isStringLiteralStart;
+exports.isRegexLiteralStart = isRegexLiteralStart;
 exports.getCurrentLine = getCurrentLine;
 exports.getEscape = getEscape;
 exports.isDoubleQuote = isDoubleQuote;
@@ -67,8 +68,8 @@ function isNotEOF(char) {
 function isIdentifierStart(char) {
     return isAlpha(char) || char === '_';
 }
-function isIdentifier(char) {
-    return isAlpha(char) || isDigit(char) || char === '_';
+function isIdentifierChar(char) {
+    return isAlpha(char) || isDigit(char) || char === '_' || char === '.';
 }
 function isAlpha(char) {
     return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z');
@@ -102,6 +103,9 @@ function isDecLiteralStart(char) {
 }
 function isStringLiteralStart(current) {
     return current === '"' || current === "'";
+}
+function isRegexLiteralStart(current) {
+    return current === '/';
 }
 function getCurrentLine(code, cursor) {
     if (cursor === undefined) {

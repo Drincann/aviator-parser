@@ -1,4 +1,4 @@
-import { parseDec, parseHex, parseOct, isDigitWithUnderscore, isDigit, isOctDigitWithUnderscore, isOctDigit, isHexDigitWithUnderscore, isHexDigit, isIdentifierStart, isNumberLiteralStart, isIdentifier, isEOF, isStringLiteralStart, getEscape, isDoubleQuote, isSingleQuote, isNotEOL, isNotEOF } from "./util.js";
+import { parseDec, parseHex, parseOct, isDigitWithUnderscore, isDigit, isOctDigitWithUnderscore, isOctDigit, isHexDigitWithUnderscore, isHexDigit, isIdentifierStart, isNumberLiteralStart, isIdentifierChar, isEOF, isStringLiteralStart, getEscape, isDoubleQuote, isSingleQuote, isNotEOL, isNotEOF, isRegexLiteralStart } from "./util.js";
 export class Lexer {
     code;
     cursor = 0;
@@ -26,6 +26,8 @@ export class Lexer {
                 return this.parseNextNumberLiteral();
             if (isStringLiteralStart(current))
                 return this.parseNextStringLiteral();
+            if (isRegexLiteralStart(current))
+                return this.parseNextRegexLiteral();
             if (current === '+')
                 return { type: 'Add', value: undefined, };
             if (current === '-')
@@ -40,12 +42,18 @@ export class Lexer {
                 return { type: 'Conditional', value: undefined, };
             if (current === ':')
                 return { type: 'Colon', value: undefined, };
+            if (current === ';')
+                return { type: 'Semicolon', value: undefined, };
             if (current === ',')
                 return { type: 'Comma', value: undefined, };
             if (current === '=') {
                 if (this.code[this.cursor] === '=') {
                     this.cursor++;
                     return { type: 'Equal', value: undefined, };
+                }
+                else if (this.code[this.cursor] === '~') {
+                    this.cursor++;
+                    return { type: 'Like', value: undefined, };
                 }
             }
             if (current === '!') {
@@ -94,8 +102,11 @@ export class Lexer {
         const start = this.cursor - 1;
         let end = this.cursor;
         let current = this.code[end];
-        while (isIdentifier(current)) {
+        while (isIdentifierChar(current)) {
             end++;
+            if (this.code[end] === '.' && this.code[end + 1] === '.') {
+                throw new Error("lexer error, invalid object access syntax");
+            }
             current = this.code[end];
         }
         this.cursor = end;
@@ -104,6 +115,8 @@ export class Lexer {
             return { type: 'True', value: 'true' };
         else if (name === 'false')
             return { type: 'False', value: 'false' };
+        else if (name === 'nil')
+            return { type: 'Nil', value: 'nil' };
         return { type: 'Identifier', value: name, };
     }
     parseNextNumberLiteral() {
@@ -181,6 +194,21 @@ export class Lexer {
             return this.parseStringLiteral(start);
         }
         throw new Error("lexer error, invalid string literal");
+    }
+    parseNextRegexLiteral() {
+        const start = this.cursor - 1;
+        let cursor = start + 1;
+        let current = this.code[cursor];
+        let literal = '';
+        while (current !== '/' && isNotEOL(current)) {
+            literal += current;
+            current = this.code[++cursor];
+        }
+        if (current !== '/') {
+            throw new Error("lexer error, unterminated regex literal");
+        }
+        this.cursor = cursor + 1;
+        return { type: 'Regex', value: literal };
     }
     /**
      * @param start the position of the first double quote
