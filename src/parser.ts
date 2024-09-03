@@ -10,7 +10,7 @@ export type ExpressionNode = {
   argument: ExpressionNode,
   operator: UnaryOperator
 
-} | RegexLiteral | StringLiteral | NumberLiteral | BooleanLiteral | Identifier
+} | RegexLiteral | StringLiteral | NumberLiteral | BooleanLiteral | Identifier | FunctionCall
 
 export type BinaryOperator =
   | 'Add' | 'Subtract' | 'Multiply' | 'Divide' | 'Mod'
@@ -41,6 +41,12 @@ export type BooleanLiteral = {
 export type Identifier = {
   type: 'identifier',
   name: string
+}
+
+export type FunctionCall = {
+  type: 'function-call',
+  name: string,
+  arguments: ExpressionNode[]
 }
 
 export class AviatorExpressionParser {
@@ -94,6 +100,10 @@ export class AviatorExpressionParser {
     } else if (this.currentToken?.type === 'Identifier') {
       const name = this.currentToken.value as string
       this.match('Identifier')
+      // @ts-ignore
+      if (this.currentToken.type === 'LeftParen') {
+        return this.parseFunctionCall(name)
+      }
       return { type: 'identifier', name }
     } else if (this.currentToken?.type === 'LeftParen') {
       this.match('LeftParen')
@@ -111,6 +121,19 @@ export class AviatorExpressionParser {
     }
   }
 
+  private parseFunctionCall(name: string): FunctionCall {
+    this.match('LeftParen')
+    const args: ExpressionNode[] = []
+    while (this.currentToken?.type !== 'RightParen') {
+      args.push(this.parseExpression())
+      if (this.currentToken?.type === 'Comma') {
+        this.match('Comma')
+      }
+    }
+    this.match('RightParen')
+    return { type: 'function-call', name, arguments: args }
+  }
+
   private next(): void {
     this.currentToken = this.lexer.next()
   }
@@ -121,7 +144,17 @@ export class AviatorExpressionParser {
     }
     this.next()
   }
+
+  private tryMatch(type: TokenType): boolean {
+    if (this.currentToken?.type === type) {
+      this.next()
+      return true
+    }
+
+    return false
+  }
 }
+
 
 function isBinaryOperator(currentToken: Token | undefined) {
   if (currentToken === undefined) return false

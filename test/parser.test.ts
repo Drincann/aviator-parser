@@ -1,4 +1,3 @@
-import util from 'util'
 import { describe, it } from "node:test"
 import assert from 'assert/strict'
 import { AviatorExpressionParser } from "../src/parser.js"
@@ -229,6 +228,20 @@ describe("parser", () => {
         operator: 'Equal',
         right: { type: 'number-literal', value: 1 }
       },
+    })
+  })
+
+  it("function call", () => {
+    const exp = `contains(tinyAccessibilityServices,"com.wtkj.app.clicker")`
+    const parser = new AviatorExpressionParser(exp)
+    const root = parser.parse()
+    assertAssignable(root, {
+      type: 'function-call',
+      name: 'contains',
+      arguments: [
+        { type: 'identifier', name: 'tinyAccessibilityServices' },
+        { type: 'string-literal', value: 'com.wtkj.app.clicker' }
+      ]
     })
   })
 })
