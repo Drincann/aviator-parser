@@ -189,6 +189,48 @@ describe("parser", () => {
       }
     })
   })
+
+  it("regex", () => {
+    const exp = `(isVirtualPhone4Shield == 1 || phoneNumberNew =~ /86192.*/) && build < 7330000 && isUserRecentRegister72hour == 1`
+    const parser = new AviatorExpressionParser(exp)
+    const root = parser.parse()
+    assertAssignable(root, {
+      type: 'binary-expression',
+      left: {
+        type: 'binary-expression',
+        left: {
+          type: 'binary-expression',
+          left: {
+            type: 'binary-expression',
+            left: { type: 'identifier', name: 'isVirtualPhone4Shield' },
+            operator: 'Equal',
+            right: { type: 'number-literal', value: 1 }
+          },
+          operator: 'LogicOr',
+          right: {
+            type: 'binary-expression',
+            left: { type: 'identifier', name: 'phoneNumberNew' },
+            operator: 'Like',
+            right: { type: 'regex-literal', value: '86192.*' }
+          }
+        },
+        operator: 'LogicAnd',
+        right: {
+          type: 'binary-expression',
+          left: { type: 'identifier', name: 'build' },
+          operator: 'LessThan',
+          right: { type: 'number-literal', value: 7330000 }
+        }
+      },
+      operator: 'LogicAnd',
+      right: {
+        type: 'binary-expression',
+        left: { type: 'identifier', name: 'isUserRecentRegister72hour' },
+        operator: 'Equal',
+        right: { type: 'number-literal', value: 1 }
+      },
+    })
+  })
 })
 
 function assertAssignable(obj: Record<string, any>, isAssignableTo: Record<string, any>, path = '$') {

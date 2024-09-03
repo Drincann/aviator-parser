@@ -10,13 +10,18 @@ export type ExpressionNode = {
   argument: ExpressionNode,
   operator: UnaryOperator
 
-} | StringLiteral | NumberLiteral | BooleanLiteral | Identifier
+} | RegexLiteral | StringLiteral | NumberLiteral | BooleanLiteral | Identifier
 
 export type BinaryOperator =
   | 'Add' | 'Subtract' | 'Multiply' | 'Divide' | 'Mod'
-  | 'Equal' | 'NotEqual' | 'LessThan' | 'LessThanEqual' | 'GreaterThan' | 'GreaterThanEqual' | 'LogicOr' | 'LogicAnd' | 'LogicNot'
+  | 'Like' | 'Equal' | 'NotEqual' | 'LessThan' | 'LessThanEqual' | 'GreaterThan' | 'GreaterThanEqual' | 'LogicOr' | 'LogicAnd' | 'LogicNot'
 
 export type UnaryOperator = 'LogicNot'
+
+export type RegexLiteral = {
+  type: 'regex-literal',
+  value: string
+}
 
 export type StringLiteral = {
   type: 'string-literal',
@@ -68,7 +73,11 @@ export class AviatorExpressionParser {
   }
 
   private tryParseUnary(): ExpressionNode | undefined {
-    if (this.currentToken?.type === 'String') {
+    if (this.currentToken?.type === 'Regex') {
+      const value = this.currentToken.value as string
+      this.match('Regex')
+      return { type: 'regex-literal', value }
+    } else if (this.currentToken?.type === 'String') {
       const value = this.currentToken.value as string
       this.match('String')
       return { type: 'string-literal', value }
@@ -118,7 +127,7 @@ function isBinaryOperator(currentToken: Token | undefined) {
   if (currentToken === undefined) return false
   return currentToken.type in {
     'Add': true, 'Subtract': true, 'Multiply': true, 'Divide': true, 'Mod': true,
-    'Equal': true, 'NotEqual': true, 'LessThan': true, 'LessThanEqual': true, 'GreaterThan': true, 'GreaterThanEqual': true, 'LogicOr': true, 'LogicAnd': true, 'LogicNot': true
+    'Like': true, 'Equal': true, 'NotEqual': true, 'LessThan': true, 'LessThanEqual': true, 'GreaterThan': true, 'GreaterThanEqual': true, 'LogicOr': true, 'LogicAnd': true, 'LogicNot': true
   }
 }
 
@@ -129,7 +138,7 @@ function getPriority(type: TokenType): number {
     case 'Multiply': case 'Divide': case 'Mod': return 13
     case 'Add': case 'Subtract': return 12
     case 'LessThan': case 'LessThanEqual': case 'GreaterThan': case 'GreaterThanEqual': return 11
-    case 'Equal': case 'NotEqual': return 10
+    case 'Equal': case 'NotEqual': case 'Like': return 10
     case 'LogicAnd': return 9
     case 'LogicOr': return 8
     case 'Conditional': return 7

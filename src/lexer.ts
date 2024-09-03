@@ -3,7 +3,8 @@ import {
   isOctDigitWithUnderscore, isOctDigit, isHexDigitWithUnderscore,
   isHexDigit, isIdentifierStart, isNumberLiteralStart, isIdentifier,
   isEOF, isStringLiteralStart, getEscape, isDoubleQuote, isSingleQuote,
-  isNotEOL, isNotEOF
+  isNotEOL, isNotEOF,
+  isRegexLiteralStart
 } from "./util.js"
 
 export type Token<TokenTypeGeneric extends TokenType = TokenType> = {
@@ -16,13 +17,14 @@ type TokenValueType<TokenTypeGeneric extends TokenType> =
   TokenTypeGeneric extends 'Identifier' ? string :
   TokenTypeGeneric extends 'Number' ? number :
   TokenTypeGeneric extends 'String' ? string :
+  TokenTypeGeneric extends 'Regex' ? string :
   TokenTypeGeneric extends 'Comment' ? string :
   undefined
 
 export type TokenType =
-  | 'Identifier' | 'Number' | 'String' | 'True' | 'False'
+  | 'Identifier' | 'Number' | 'String' | 'True' | 'False' | 'Regex'
   | 'Add' | 'Subtract' | 'Multiply' | 'Divide' | 'Mod'
-  | 'Equal' | 'NotEqual' | 'LessThan' | 'LessThanEqual' | 'GreaterThan' | 'GreaterThanEqual' | 'LogicOr' | 'LogicAnd' | 'LogicNot'
+  | 'Like' | 'Equal' | 'NotEqual' | 'LessThan' | 'LessThanEqual' | 'GreaterThan' | 'GreaterThanEqual' | 'LogicOr' | 'LogicAnd' | 'LogicNot'
   | 'LeftParen' | 'RightParen'
   | 'Conditional'
   | 'Colon'
@@ -55,6 +57,7 @@ export class Lexer {
       if (isIdentifierStart(current)) return this.parseNextIdentifier()
       if (isNumberLiteralStart(current)) return this.parseNextNumberLiteral()
       if (isStringLiteralStart(current)) return this.parseNextStringLiteral()
+      if (isRegexLiteralStart(current)) return this.parseNextRegexLiteral()
 
       if (current === '+') return { type: 'Add', value: undefined, }
       if (current === '-') return { type: 'Subtract', value: undefined, }
@@ -69,6 +72,9 @@ export class Lexer {
         if (this.code[this.cursor] === '=') {
           this.cursor++
           return { type: 'Equal', value: undefined, }
+        } else if (this.code[this.cursor] === '~') {
+          this.cursor++
+          return { type: 'Like', value: undefined, }
         }
       }
 
@@ -213,6 +219,23 @@ export class Lexer {
     throw new Error("lexer error, invalid string literal")
   }
 
+  private parseNextRegexLiteral(): Token<'Regex'> | undefined {
+    const start = this.cursor - 1
+    let cursor = start + 1
+    let current = this.code[cursor]
+    let literal = ''
+
+    while (current !== '/' && isNotEOL(current)) {
+      literal += current
+      current = this.code[++cursor]
+    }
+    if (current !== '/') {
+      throw new Error("lexer error, unterminated regex literal")
+    }
+
+    this.cursor = cursor + 1
+    return { type: 'Regex', value: literal }
+  }
 
   /**
    * @param start the position of the first double quote
