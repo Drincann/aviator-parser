@@ -6,14 +6,26 @@ import static io.github.drincann.aviator.lexer.token.AviatorTokenType.CONDITIONA
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DIVIDE;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DOT;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.EOF;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.EQUAL;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.FALSE;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.GREATER_THAN;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.GREATER_THAN_EQUAL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.IDENTIFIER;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LEFT_BRACKET;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LEFT_PAREN;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LESS_THAN;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LESS_THAN_EQUAL;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_AND;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_NOT;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_OR;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.MULTIPLY;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NIL;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NOT_EQUAL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NUMBER;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.RIGHT_PAREN;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.STRING;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.SUBTRACT;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.TRUE;
 import static io.github.drincann.aviator.util.CollectionUtil.map;
 
 import java.util.ArrayList;
@@ -30,24 +42,33 @@ import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 public class Pratt {
     private static final Map<AviatorTokenType, Integer> INFIX_OPERATOR_LEFT_BINDING_POWER = map(AviatorTokenType.class, Integer.class,
             CONDITIONAL, 2,
-            ADD, 3, SUBTRACT, 3,
-            MULTIPLY, 5, DIVIDE, 5,
-            DOT, 7
+            LOGIC_OR, 3,
+            LOGIC_AND, 9,
+            EQUAL, 7, NOT_EQUAL, 7,
+            GREATER_THAN, 9, GREATER_THAN_EQUAL, 9, LESS_THAN, 9, LESS_THAN_EQUAL, 9,
+            ADD, 11, SUBTRACT, 11,
+            MULTIPLY, 13, DIVIDE, 13,
+            DOT, 15
     );
 
     private static final Map<AviatorTokenType, Integer> INFIX_OPERATOR_RIGHT_BINDING_POWER = map(AviatorTokenType.class, Integer.class,
             CONDITIONAL, 1,
-            ADD, 4, SUBTRACT, 4,
-            MULTIPLY, 6, DIVIDE, 6,
-            DOT, 8
+            LOGIC_OR, 4,
+            LOGIC_AND, 6,
+            EQUAL, 8, NOT_EQUAL, 8,
+            GREATER_THAN, 10, GREATER_THAN_EQUAL, 10, LESS_THAN, 10, LESS_THAN_EQUAL, 10,
+            ADD, 12, SUBTRACT, 12,
+            MULTIPLY, 14, DIVIDE, 14,
+            DOT, 16
     );
 
     private static final Map<AviatorTokenType, Integer> PREFIX_OPERATOR_BINDING_POWER = map(AviatorTokenType.class, Integer.class,
-            SUBTRACT, 7
+            SUBTRACT, 15,
+            LOGIC_NOT, 15
     );
 
     private static final Map<AviatorTokenType, Integer> POSTFIX_OPERATOR_BINDING_POWER = map(AviatorTokenType.class, Integer.class,
-            LEFT_PAREN, 7, LEFT_BRACKET, 7
+            LEFT_PAREN, 15, LEFT_BRACKET, 15
     );
 
     private final AviatorLexer lexer;
@@ -56,22 +77,22 @@ public class Pratt {
 
     private AviatorToken lookahead;
 
-    private String result;
+    private Expr result;
 
     public Pratt(AviatorLexer lexer) {
         this.lexer = lexer;
     }
 
-    public static Pratt parse(String code) {
-        return new Pratt(new AviatorLexer(code));
+    public static Expr parse(String code) {
+        return new Pratt(new AviatorLexer(code)).parse();
     }
 
-    public String rp() {
+    private Expr parse() {
         if (this.result != null) {
             return result;
         }
         next();
-        this.result = expr(0).rp();
+        this.result = expr(0);
         return this.result;
     }
 
@@ -140,6 +161,20 @@ public class Pratt {
             left = new Node().setOperator(op).setOperands(left, subexpr);
         }
 
+        if (tokenIs(LEFT_PAREN)) {
+            // function call
+            List<Expr> arguments = new ArrayList<>();
+            while (!peek(RIGHT_PAREN)) {
+                arguments.add(expr(0));
+                if (peek(RIGHT_PAREN)) {
+                    break;
+                }
+                eat(AviatorTokenType.COMMA);
+            }
+            left = new FunctionCall().setFunction(left).setArguments(arguments);
+            eat(RIGHT_PAREN);
+        }
+
         return left;
     }
 
@@ -169,20 +204,35 @@ public class Pratt {
             return new Node().setOperator(op).setOperands(right);
         }
 
+        // lambda function
+        // lambda (...params) -> body end
+        if (tokenIs(AviatorTokenType.LAMBDA)) {
+            eat(LEFT_PAREN);
+            List<String> parameters = new ArrayList<>();
+            while (!tokenIs(RIGHT_PAREN)) {
+                parameters.add(next().getLexeme());
+                if (peek(RIGHT_PAREN)) {
+                    break;
+                }
+                eat(AviatorTokenType.COMMA);
+            }
+            eat(RIGHT_PAREN);
+            eat(AviatorTokenType.ARROW);
+            Expr body = expr(0);
+            eat(AviatorTokenType.END);
+            return new LambdaFunction().setParameters(parameters).setBody(body);
+        }
+
         throw new RuntimeException("Unexpected primary token: " + token());
     }
 
     private boolean tokenIsUnary() {
-        return tokenIs(SUBTRACT);
+        return tokenIs(SUBTRACT) || tokenIs(LOGIC_NOT);
 
     }
 
     private boolean tokenIsLeaf() {
-        return tokenIs(NUMBER) || tokenIs(IDENTIFIER) || tokenIs(STRING);
-    }
-
-    private boolean peekEof() {
-        return peek().getType().equals(EOF);
+        return tokenIs(NUMBER) || tokenIs(IDENTIFIER) || tokenIs(STRING) || tokenIs(TRUE) || tokenIs(FALSE) || tokenIs(NIL);
     }
 
     private static int infixRbp(AviatorToken op) {
@@ -221,6 +271,14 @@ public class Pratt {
         return this.token;
     }
 
+    private boolean peekEof() {
+        return peek().getType().equals(EOF);
+    }
+
+    private boolean peek(AviatorTokenType type) {
+        return peek().getType().equals(type);
+    }
+
     private AviatorToken peek() {
         return this.lookahead;
     }
@@ -232,8 +290,10 @@ public class Pratt {
         }
     }
 
-    public static interface Expr {
+    public interface Expr {
         String rp();
+
+        List<Expr> getChildren();
     }
 
     public static class Leaf implements Expr {
@@ -241,6 +301,11 @@ public class Pratt {
 
         public String rp() {
             return token.getLexeme();
+        }
+
+        @Override
+        public List<Expr> getChildren() {
+            return new ArrayList<>();
         }
 
         public AviatorToken getToken() {
@@ -259,9 +324,9 @@ public class Pratt {
     }
 
     public static class Node implements Expr {
-
         private AviatorToken operator;
         private List<Expr> operands;
+        private List<Expr> children;
 
         public String rp() {
             return '('
@@ -287,15 +352,95 @@ public class Pratt {
             return operands;
         }
 
+        public List<Expr> getChildren() {
+            return children;
+        }
+
         public Node setOperands(Expr... operands) {
             this.operands = new ArrayList<>();
             Collections.addAll(this.operands, operands);
+            this.children = new ArrayList<>();
+            Collections.addAll(this.children, operands);
             return this;
         }
 
         @Override
         public String toString() {
-            return operator.getLexeme() + flat(operands);
+            if (operands.size() == 1) {
+                return "(" + operator.getLexeme() + operands.get(0) + ")";
+            }
+
+            if (operands.size() == 2) {
+                return "(" + operands.get(0) + " " + operator.getLexeme() + " " + operands.get(1) + ")";
+            }
+
+            if (operands.size() == 3) {
+                return "(" + operands.get(0) + " " + operator.getLexeme() + " " + operands.get(1) + ":" + operands.get(2) + ")";
+            }
+
+            throw new RuntimeException("Unexpected node: " + operator.getLexeme() + " " + operands);
+        }
+    }
+
+    public static class FunctionCall implements Expr {
+        private Expr function;
+        private List<Expr> arguments;
+
+        public FunctionCall setFunction(Expr function) {
+            this.function = function;
+            return this;
+        }
+
+        public FunctionCall setArguments(List<Expr> arguments) {
+            this.arguments = arguments;
+            return this;
+        }
+
+        public String rp() {
+            return "(" + function.rp() + flat(arguments) + ")";
+        }
+
+        @Override
+        public List<Expr> getChildren() {
+            return new ArrayList<>(arguments);
+        }
+
+        private String flat(List<Expr> exprs) {
+            return exprs.stream().map(t -> " " + t.rp()).collect(Collectors.joining());
+        }
+
+        @Override
+        public String toString() {
+            return function + "(" + arguments.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")";
+        }
+    }
+
+    public static class LambdaFunction implements Expr {
+        private List<String> parameters;
+        private Expr body;
+
+        public LambdaFunction setParameters(List<String> parameters) {
+            this.parameters = parameters;
+            return this;
+        }
+
+        public LambdaFunction setBody(Expr body) {
+            this.body = body;
+            return this;
+        }
+
+        public String rp() {
+            return "lambda (" + String.join(" ", parameters) + ") -> " + body.rp() + " end";
+        }
+
+        @Override
+        public List<Expr> getChildren() {
+            return new ArrayList<Expr>() {{ add(body); }};
+        }
+
+        @Override
+        public String toString() {
+            return "lambda (" + String.join(", ", parameters) + ") -> " + body + " end";
         }
     }
 }
