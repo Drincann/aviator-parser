@@ -454,14 +454,14 @@ public class AviatorLexer {
 
         int start = cursor;
         while (currentChar() != quote && isNotEOL(peek()) && currentChar() != 0) {
-            if (currentChar() == '\\') {
-                nextChar(); // skip '\'
-                if (currentChar() == 'n') { sb.append('\n'); }
-                if (currentChar() == 'r') { sb.append('\r'); }
-                if (currentChar() == 't') { sb.append('\t'); }
-                sb.append(currentChar());
-                continue;
-            }
+//            if (currentChar() == '\\') {
+//                nextChar(); // skip '\'
+//                if (currentChar() == 'n') { sb.append('\n'); }
+//                if (currentChar() == 'r') { sb.append('\r'); }
+//                if (currentChar() == 't') { sb.append('\t'); }
+//                sb.append(currentChar());
+//                continue;
+//            }
             sb.append(currentChar());
             nextChar();
         }
@@ -471,7 +471,7 @@ public class AviatorLexer {
         //    ^___cursor
 
         assertStringEnd(quote, start, cursor);
-        return string(start - 1, cursor, sb.toString());
+        return string(start - 1, cursor, quote + sb.toString() + quote);
     }
 
     private void assertRegexEnd(int start) {
