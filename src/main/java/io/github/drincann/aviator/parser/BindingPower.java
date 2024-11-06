@@ -32,7 +32,7 @@ public class BindingPower {
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
                     CONDITIONAL, 2,
                     LOGIC_OR, 3,
-                    LOGIC_AND, 9,
+                    LOGIC_AND, 5,
                     EQUAL, 7, NOT_EQUAL, 7,
                     GREATER_THAN, 9, GREATER_THAN_EQUAL, 9, LESS_THAN, 9, LESS_THAN_EQUAL, 9,
                     ADD, 11, SUBTRACT, 11,
