@@ -51,7 +51,7 @@ class AviatorLexerTest {
         assertEquals(AviatorTokenType.LEFT_BRACKET, token.getType());
 
         token = lexer.next();
-        assertEquals("1", token.getLexeme());
+        assertEquals("'1'", token.getLexeme());
         assertEquals(AviatorTokenType.STRING, token.getType());
 
         token = lexer.next();
@@ -63,7 +63,7 @@ class AviatorLexerTest {
         assertEquals(AviatorTokenType.LEFT_BRACKET, token.getType());
 
         token = lexer.next();
-        assertEquals("2", token.getLexeme());
+        assertEquals("'2'", token.getLexeme());
         assertEquals(AviatorTokenType.STRING, token.getType());
 
         token = lexer.next();
@@ -451,7 +451,7 @@ class AviatorLexerTest {
     @Test
     public void testNormalStringLiteral() {
         AviatorLexer lexer = new AviatorLexer("\"hello world\"");
-        assertEquals("hello world", lexer.next().getLexeme());
+        assertEquals("\"hello world\"", lexer.next().getLexeme());
     }
 
     @Test
