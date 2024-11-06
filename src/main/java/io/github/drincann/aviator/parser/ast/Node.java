@@ -8,16 +8,10 @@ import java.util.stream.Collectors;
 import io.github.drincann.aviator.lexer.token.AviatorToken;
 
 public class Node implements Expr {
-
     private AviatorToken operator;
     private List<Expr> operands;
+    private List<Expr> children;
 
-    public String rp() {
-        return '('
-                + operator.getLexeme()
-                + flat(operands)
-                + ')';
-    }
 
     private String flat(List<Expr> exprs) {
         return exprs.stream().map(t -> " " + t.rp()).collect(Collectors.joining());
@@ -39,11 +33,38 @@ public class Node implements Expr {
     public Node setOperands(Expr... operands) {
         this.operands = new ArrayList<>();
         Collections.addAll(this.operands, operands);
+        this.children = new ArrayList<>();
+        Collections.addAll(this.children, operands);
         return this;
     }
 
     @Override
+    public String rp() {
+        return '('
+                + operator.getLexeme()
+                + flat(operands)
+                + ')';
+    }
+
+    @Override
+    public List<Expr> getChildren() {
+        return children;
+    }
+
+    @Override
     public String toString() {
-        return operator.getLexeme() + flat(operands);
+        if (operands.size() == 1) {
+            return "(" + operator.getLexeme() + operands.get(0) + ")";
+        }
+
+        if (operands.size() == 2) {
+            return "(" + operands.get(0) + " " + operator.getLexeme() + " " + operands.get(1) + ")";
+        }
+
+        if (operands.size() == 3) {
+            return "(" + operands.get(0) + " " + operator.getLexeme() + " " + operands.get(1) + ":" + operands.get(2) + ")";
+        }
+
+        throw new RuntimeException("Unexpected node: " + operator.getLexeme() + " " + operands);
     }
 }

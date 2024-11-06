@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.github.drincann.aviator.parser.Pratt;
+import io.github.drincann.aviator.parser.ast.Expr;
+import io.github.drincann.aviator.parser.ast.Leaf;
 
 public class ParserUtil {
-    public static List<Pratt.Expr> getLeafParentNodes(Pratt.Expr expr) {
-        if (expr instanceof Pratt.Leaf) {
+    public static List<Expr> getLeafParentNodes(Expr expr) {
+        if (expr instanceof Leaf) {
             return new ArrayList<>();
         }
 
         if (allChildrenAreLeafNodes(expr)) {
-            return new ArrayList<Pratt.Expr>() {{ add(expr); }};
+            return new ArrayList<Expr>() {{ add(expr); }};
         }
 
         return expr.getChildren().stream()
@@ -22,9 +23,9 @@ public class ParserUtil {
                 .collect(Collectors.toList());
     }
 
-    private static boolean allChildrenAreLeafNodes(Pratt.Expr expr) {
-        for (Pratt.Expr child : expr.getChildren()) {
-            if (!(child instanceof Pratt.Leaf)) {
+    private static boolean allChildrenAreLeafNodes(Expr expr) {
+        for (Expr child : expr.getChildren()) {
+            if (!(child instanceof Leaf)) {
                 return false;
             }
         }
