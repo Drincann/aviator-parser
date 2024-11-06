@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 import io.github.drincann.aviator.parser.ast.Expr;
 import io.github.drincann.aviator.parser.ast.Leaf;
+import io.github.drincann.aviator.parser.ast.Node;
 
 public class ParserUtil {
     public static List<Expr> getLeafParentNodes(Expr expr) {
@@ -30,5 +32,32 @@ public class ParserUtil {
             }
         }
         return true;
+    }
+
+    public static List<Expr> split(Expr expr) {
+        if (expr instanceof Node) {
+            if (operatorIsOr((Node) expr)) {
+                return new ArrayList<Expr>() {{ add(expr); }};
+            }
+
+            if (operatorIsAnd((Node) expr)) {
+                return new ArrayList<Expr>() {{
+                    addAll(expr.getChildren().stream()
+                            .map(ParserUtil::split)
+                            .flatMap(List::stream)
+                            .collect(Collectors.toList()));
+                }};
+            }
+        }
+
+        return new ArrayList<Expr>() {{ add(expr); }};
+    }
+
+    private static boolean operatorIsAnd(Node expr) {
+        return expr.getOperator().getType().equals(AviatorTokenType.LOGIC_AND);
+    }
+
+    private static boolean operatorIsOr(Node expr) {
+        return expr.getOperator().getType().equals(AviatorTokenType.LOGIC_OR);
     }
 }
