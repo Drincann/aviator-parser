@@ -1,5 +1,7 @@
 package io.github.drincann.aviator.parser.ast;
 
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DOT;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,6 +60,9 @@ public class Node implements Expr {
         }
 
         if (operands.size() == 2) {
+            if (operator.getType().equals(DOT)) {
+                return operands.get(0) + operator.getLexeme() + operands.get(1);
+            }
             return "(" + operands.get(0) + " " + operator.getLexeme() + " " + operands.get(1) + ")";
         }
 
