@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.drincann</groupId>
-    <artifactId>aviator-parser-java</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>aviator-parser</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -20,6 +20,43 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>nexus snapshot repository</name>
+            <url>https://artifactory.devops.xiaohongshu.com/artifactory/maven-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>releases</id>
+            <name>nexus repository</name>
+            <url>https://artifactory.devops.xiaohongshu.com/artifactory/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 </project>
