@@ -465,4 +465,10 @@ class AviatorLexerTest {
         AviatorLexer lexer = new AviatorLexer("\"hello world\n");
         assertThrows(AviatorLexerException.class, lexer::next);
     }
+
+    @Test
+    public void testEscapeQuoteInStringLiteral() {
+        AviatorLexer lexer = new AviatorLexer("\"\\\"\"");
+        assertEquals("\"\\\"\"", lexer.next().getLexeme());
+    }
 }

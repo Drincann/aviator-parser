@@ -449,29 +449,25 @@ public class AviatorLexer {
      */
     private AviatorToken parseNextStringLiteral() {
         char quote = currentChar();
-        nextChar(); // skip start quote
         StringBuilder sb = new StringBuilder();
 
         int start = cursor;
-        while (currentChar() != quote && isNotEOL(peek()) && currentChar() != 0) {
-//            if (currentChar() == '\\') {
-//                nextChar(); // skip '\'
-//                if (currentChar() == 'n') { sb.append('\n'); }
-//                if (currentChar() == 'r') { sb.append('\r'); }
-//                if (currentChar() == 't') { sb.append('\t'); }
-//                sb.append(currentChar());
-//                continue;
-//            }
-            sb.append(currentChar());
+        while (peek() != quote && isNotEOL(peek()) && peek() != 0) {
             nextChar();
+            if (currentChar() == '\\') {
+                nextChar(); // skip '\'
+                sb.append("\\").append(currentChar());
+                continue;
+            }
+            sb.append(currentChar());
         }
         // "abc"
-        //     ^___cursor
+        //    ^___cursor
         // "abc<EOL>
         //    ^___cursor
-
+        nextChar(); // skip to end quote
         assertStringEnd(quote, start, cursor);
-        return string(start - 1, cursor, quote + sb.toString() + quote);
+        return string(start, cursor, quote + sb.toString() + quote);
     }
 
     private void assertRegexEnd(int start) {

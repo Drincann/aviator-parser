@@ -144,4 +144,10 @@ class PrattTest {
         Expr expr = Pratt.parse("1 > 2 == 3");
         assertEquals("(== (> 1 2) 3)", expr.rp());
     }
+
+    @Test
+    public void testUseCase1() {
+       Expr  expr = Pratt.parse("fun(\"\\\"\")" );
+        assertEquals("(fun \"\\\"\")", expr.rp());
+    }
 }
