@@ -1,6 +1,7 @@
 package io.github.drincann.aviator.parser.ast;
 
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DOT;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LEFT_BRACKET;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.drincann.aviator.lexer.token.AviatorToken;
+import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 
 public class Node implements Expr {
     private AviatorToken operator;
@@ -62,6 +64,9 @@ public class Node implements Expr {
         if (operands.size() == 2) {
             if (operator.getType().equals(DOT)) {
                 return operands.get(0) + operator.getLexeme() + operands.get(1);
+            }
+            if (operator.getType().equals(LEFT_BRACKET)) {
+                return operands.get(0) + "[" + operands.get(1) + "]";
             }
             return "(" + operands.get(0) + " " + operator.getLexeme() + " " + operands.get(1) + ")";
         }

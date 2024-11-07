@@ -147,7 +147,13 @@ class PrattTest {
 
     @Test
     public void testUseCase1() {
-       Expr  expr = Pratt.parse("fun(\"\\\"\")" );
+        Expr expr = Pratt.parse("fun(\"\\\"\")");
         assertEquals("(fun \"\\\"\")", expr.rp());
+    }
+
+    @Test
+    public void testObjectAccessStringify() {
+        Expr expr = Pratt.parse("a.b[c]['d'].e");
+        assertEquals("a.b[c]['d'].e", expr.toString());
     }
 }
