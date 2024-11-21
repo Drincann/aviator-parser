@@ -246,6 +246,9 @@ public class AviatorLexer {
     }
 
     private AviatorToken parseNextLessOrBitShiftLeft() {
+        AviatorToken lt = token(LESS_THAN, "<");
+
+        untilNonMatch(LexerUtil::isWhiteSpace);
         if (peek() == '=') {
             nextChar();
             return token(LESS_THAN_EQUAL, "<=");
@@ -256,7 +259,7 @@ public class AviatorLexer {
             return token(SIGNED_BIT_SHIFT_LEFT, "<<");
         }
 
-        return token(LESS_THAN, "<");
+        return lt;
     }
 
     /**
@@ -269,6 +272,9 @@ public class AviatorLexer {
      * |_____________cursor
      */
     private AviatorToken parseNextGreaterOrBitShiftRight() {
+        AviatorToken gt = token(GREATER_THAN, ">");
+
+        untilNonMatch(LexerUtil::isWhiteSpace);
         if (peek() == '=') { // >=
             nextChar(); //       ^
             return token(GREATER_THAN_EQUAL, ">=");
@@ -276,19 +282,24 @@ public class AviatorLexer {
 
         if (peek() == '>') { // >>
             nextChar(); //       ^
+            AviatorToken shiftRight = token(SIGNED_BIT_SHIFT_RIGHT, ">>");
 
+            untilNonMatch(LexerUtil::isWhiteSpace);
             if (peek() == '>') { // >>>
                 nextChar(); //        ^
                 return token(UNSIGNED_BIT_SHIFT_RIGHT, ">>>");
             }
 
-            return token(SIGNED_BIT_SHIFT_RIGHT, ">>");
+            return shiftRight;
         }
 
-        return token(GREATER_THAN, ">");
+        return gt;
     }
 
     private AviatorToken parseNextEqualLikeOrAssign() {
+        AviatorToken assign = token(AviatorTokenType.ASSIGN, "=");
+
+        untilNonMatch(LexerUtil::isWhiteSpace);
         if (peek() == '=') {
             nextChar();
             return token(EQUAL, "==");
@@ -298,34 +309,43 @@ public class AviatorLexer {
             return token(AviatorTokenType.LIKE, "=~");
         }
 
-        return token(AviatorTokenType.ASSIGN, "=");
+        return assign;
     }
 
     private AviatorToken parseNextNotOrNotEqual() {
+        AviatorToken not = token(LOGIC_NOT, "!");
+
+        untilNonMatch(LexerUtil::isWhiteSpace);
         if (peek() == '=') {
             nextChar();
             return token(NOT_EQUAL, "!=");
         }
 
-        return token(LOGIC_NOT, "!");
+        return not;
     }
 
     private AviatorToken tokenSubtractOrArrow() {
+        AviatorToken sub = token(SUBTRACT, "-");
+
+        untilNonMatch(LexerUtil::isWhiteSpace);
         if (peek() == '>') {
             nextChar();
             return token(ARROW, "->");
         }
 
-        return token(SUBTRACT, "-");
+        return sub;
     }
 
     private AviatorToken parseMultiplyOrPower() {
+        AviatorToken mul = token(MULTIPLY, "*");
+
+        untilNonMatch(LexerUtil::isWhiteSpace);
         if (peek() == '*') {
             nextChar(); // skip first '*'
             return token(POW, "**");
         }
 
-        return token(MULTIPLY, "*");
+        return mul;
 
     }
 
@@ -419,9 +439,9 @@ public class AviatorLexer {
      *                 |________________________________start
      */
     private AviatorToken parseNextRegexLiteral() {
+        int start = cursor;
         nextChar(); // skip first '/'
 
-        int start = cursor;
         untilMeet('/', '\n', '\r');
         // /abc/
         //    ^___cursor
@@ -503,7 +523,7 @@ public class AviatorLexer {
 
     private AviatorToken regex(int start) {
         return lastToken = new AviatorToken()
-                .setType(AviatorTokenType.REGEX).setLexeme(code.substring(start, cursor))
+                .setType(AviatorTokenType.REGEX).setLexeme(code.substring(start, cursor + 1))
                 .setStart(start).setEnd(cursor + 1).setLine(line);
     }
 

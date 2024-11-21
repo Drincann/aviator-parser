@@ -25,6 +25,10 @@ public class LexerUtil {
         return ch != '\n' && ch != '\r';
     }
 
+    public static boolean isWhiteSpace(char ch) {
+        return ch ==' ' || ch == '\t' || ch == '\f' || ch == '\b' || ch == '\n' || ch == '\r';
+    }
+
     public static boolean isDigit(char ch) {
         return ch >= '0' && ch <= '9';
     }

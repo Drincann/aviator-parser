@@ -4,6 +4,7 @@ import static io.github.drincann.aviator.lexer.token.AviatorTokenType.ADD;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.BIT_NOT;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DIVIDE;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.EOF;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LESS_THAN_EQUAL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.MULTIPLY;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NUMBER;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.REGEX;
@@ -111,10 +112,10 @@ class AviatorLexerTest {
 
     @Test
     public void testValidRegexLiteral() {
-        assertEquals("[a-zA-Z_][a-zA-Z0-9_]*\\s*\\(",
+        assertEquals("/[a-zA-Z_][a-zA-Z0-9_]*\\s*\\(/",
                 new AviatorLexer("/[a-zA-Z_][a-zA-Z0-9_]*\\s*\\(/").next()
                         .getLexeme());
-        assertEquals("", new AviatorLexer("//").next().getLexeme());
+        assertEquals("//", new AviatorLexer("//").next().getLexeme());
     }
 
     @Test
@@ -408,7 +409,7 @@ class AviatorLexerTest {
         assertEquals("a", lexer.next().getLexeme());
         assertEquals("=", lexer.next().getLexeme());
         AviatorToken regex = lexer.next();
-        assertEquals("1", regex.getLexeme());
+        assertEquals("/1/", regex.getLexeme());
         assertEquals(REGEX, regex.getType());
     }
 
@@ -432,7 +433,7 @@ class AviatorLexerTest {
         assertEquals("{", lexer.next().getLexeme());
         assertEquals("}", lexer.next().getLexeme());
         AviatorToken regex = lexer.next();
-        assertEquals("1", regex.getLexeme());
+        assertEquals("/1/", regex.getLexeme());
         assertEquals(REGEX, regex.getType());
     }
 
@@ -470,5 +471,14 @@ class AviatorLexerTest {
     public void testEscapeQuoteInStringLiteral() {
         AviatorLexer lexer = new AviatorLexer("\"\\\"\"");
         assertEquals("\"\\\"\"", lexer.next().getLexeme());
+    }
+
+    @Test
+    public void testSpaceInToken() {
+        AviatorLexer lexer = new AviatorLexer("let a < = 1");
+        assertEquals("let", lexer.next().getLexeme());
+        assertEquals("a", lexer.next().getLexeme());
+        assertEquals(LESS_THAN_EQUAL, lexer.next().getType());
+        assertEquals("1", lexer.next().getLexeme());
     }
 }

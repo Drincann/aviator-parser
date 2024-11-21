@@ -29,4 +29,20 @@ class ParserUtilTest {
         assertEquals(1, split.size());
         assertEquals("(((A == 1) && ((B == 2) || (C.D == true))) || (E == 'hello'))", split.get(0).toString());
     }
+
+    @Test
+    public void case1() {
+        String expr =
+                "let a = userSeqFeature.result['16247-16247-16247']; a=b;userSeqFeature != '' && userId != '' && seqAbnormalDeviceTopGramUser == '16247-16247-16247' && double(a.tf) > 0.95 && long(userSeqFeature.totalCount) > 100";
+        expr = expr.replaceAll(".*;", "");
+
+        List<Expr> split = ParserUtil.split(Pratt.parse(expr));
+
+        assertEquals(5, split.size());
+        assertEquals("(userSeqFeature != '')", split.get(0).toString());
+        assertEquals("(userId != '')", split.get(1).toString());
+        assertEquals("(seqAbnormalDeviceTopGramUser == '16247-16247-16247')", split.get(2).toString());
+        assertEquals("(double(a.tf) > 0.95)", split.get(3).toString());
+        assertEquals("(long(userSeqFeature.totalCount) > 100)", split.get(4).toString());
+    }
 }
