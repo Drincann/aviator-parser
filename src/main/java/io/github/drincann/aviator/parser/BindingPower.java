@@ -11,6 +11,7 @@ import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LEFT_BRACK
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LEFT_PAREN;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LESS_THAN;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LESS_THAN_EQUAL;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LIKE;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_AND;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_NOT;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_OR;
@@ -33,31 +34,33 @@ public class BindingPower {
                     CONDITIONAL, 2,
                     LOGIC_OR, 3,
                     LOGIC_AND, 5,
-                    EQUAL, 7, NOT_EQUAL, 7,
-                    GREATER_THAN, 9, GREATER_THAN_EQUAL, 9, LESS_THAN, 9, LESS_THAN_EQUAL, 9,
-                    ADD, 11, SUBTRACT, 11,
-                    MULTIPLY, 13, DIVIDE, 13,
-                    DOT, 15
+                    LIKE, 7,
+                    EQUAL, 9, NOT_EQUAL, 9,
+                    GREATER_THAN, 11, GREATER_THAN_EQUAL, 11, LESS_THAN, 11, LESS_THAN_EQUAL, 11,
+                    ADD, 13, SUBTRACT, 13,
+                    MULTIPLY, 15, DIVIDE, 15,
+                    DOT, 17
             );
     static final Map<AviatorTokenType, Integer> INFIX_OPERATOR_RIGHT_BINDING_POWER =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
                     CONDITIONAL, 1,
                     LOGIC_OR, 4,
                     LOGIC_AND, 6,
-                    EQUAL, 8, NOT_EQUAL, 8,
-                    GREATER_THAN, 10, GREATER_THAN_EQUAL, 10, LESS_THAN, 10, LESS_THAN_EQUAL, 10,
-                    ADD, 12, SUBTRACT, 12,
-                    MULTIPLY, 14, DIVIDE, 14,
-                    DOT, 16
+                    LIKE, 8,
+                    EQUAL, 10, NOT_EQUAL, 10,
+                    GREATER_THAN, 12, GREATER_THAN_EQUAL, 12, LESS_THAN, 12, LESS_THAN_EQUAL, 12,
+                    ADD, 14, SUBTRACT, 14,
+                    MULTIPLY, 16, DIVIDE, 16,
+                    DOT, 18
             );
     static final Map<AviatorTokenType, Integer> PREFIX_OPERATOR_BINDING_POWER =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
-                    SUBTRACT, 15,
-                    LOGIC_NOT, 15
+                    SUBTRACT, 17,
+                    LOGIC_NOT, 17
             );
     static final Map<AviatorTokenType, Integer> POSTFIX_OPERATOR_BINDING_POWER =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
-                    LEFT_PAREN, 15, LEFT_BRACKET, 15
+                    LEFT_PAREN, 17, LEFT_BRACKET, 17
             );
 
     static boolean isPostfix(AviatorToken op) {

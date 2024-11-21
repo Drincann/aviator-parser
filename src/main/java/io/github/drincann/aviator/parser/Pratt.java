@@ -11,6 +11,7 @@ import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LEFT_PAREN
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_NOT;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NIL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NUMBER;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.REGEX;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.RIGHT_PAREN;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.STRING;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.SUBTRACT;
@@ -216,7 +217,7 @@ public class Pratt {
     }
 
     private boolean peekLeaf() {
-        return peek(NUMBER) || peek(IDENTIFIER) || peek(STRING) || peek(TRUE) || peek(FALSE) || peek(NIL);
+        return peek(NUMBER) || peek(IDENTIFIER) || peek(STRING) || peek(TRUE) || peek(FALSE) || peek(NIL) || peek(REGEX);
     }
 
     private AviatorToken next() {

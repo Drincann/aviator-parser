@@ -156,4 +156,10 @@ class PrattTest {
         Expr expr = Pratt.parse("a.b[c]['d'].e");
         assertEquals("a.b[c]['d'].e", expr.toString());
     }
+
+    @Test
+    public void testRegex() {
+        Expr expr = Pratt.parse("phoneWithCountryCode =~ /86162.*/");
+        assertEquals("(=~ phoneWithCountryCode /86162.*/)", expr.rp());
+    }
 }
