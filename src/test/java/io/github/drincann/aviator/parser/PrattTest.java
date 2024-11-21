@@ -162,4 +162,10 @@ class PrattTest {
         Expr expr = Pratt.parse("phoneWithCountryCode =~ /86162.*/");
         assertEquals("(=~ phoneWithCountryCode /86162.*/)", expr.rp());
     }
+
+    @Test
+    public void testMod() {
+        Expr expr = Pratt.parse("1 % 2 % 3");
+        assertEquals("(% (% 1 2) 3)", expr.rp());
+    }
 }

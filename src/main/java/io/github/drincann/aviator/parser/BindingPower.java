@@ -15,6 +15,7 @@ import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LIKE;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_AND;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_NOT;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_OR;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.MOD;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.MULTIPLY;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NOT_EQUAL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.SUBTRACT;
@@ -38,8 +39,9 @@ public class BindingPower {
                     EQUAL, 9, NOT_EQUAL, 9,
                     GREATER_THAN, 11, GREATER_THAN_EQUAL, 11, LESS_THAN, 11, LESS_THAN_EQUAL, 11,
                     ADD, 13, SUBTRACT, 13,
-                    MULTIPLY, 15, DIVIDE, 15,
-                    DOT, 17
+                    MOD, 15,
+                    MULTIPLY, 17, DIVIDE, 17,
+                    DOT, 19
             );
     static final Map<AviatorTokenType, Integer> INFIX_OPERATOR_RIGHT_BINDING_POWER =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
@@ -50,17 +52,18 @@ public class BindingPower {
                     EQUAL, 10, NOT_EQUAL, 10,
                     GREATER_THAN, 12, GREATER_THAN_EQUAL, 12, LESS_THAN, 12, LESS_THAN_EQUAL, 12,
                     ADD, 14, SUBTRACT, 14,
-                    MULTIPLY, 16, DIVIDE, 16,
-                    DOT, 18
+                    MOD, 16,
+                    MULTIPLY, 18, DIVIDE, 18,
+                    DOT, 20
             );
     static final Map<AviatorTokenType, Integer> PREFIX_OPERATOR_BINDING_POWER =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
-                    SUBTRACT, 17,
-                    LOGIC_NOT, 17
+                    SUBTRACT, 19,
+                    LOGIC_NOT, 19
             );
     static final Map<AviatorTokenType, Integer> POSTFIX_OPERATOR_BINDING_POWER =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
-                    LEFT_PAREN, 17, LEFT_BRACKET, 17
+                    LEFT_PAREN, 19, LEFT_BRACKET, 19
             );
 
     static boolean isPostfix(AviatorToken op) {
