@@ -41,6 +41,11 @@ public class FunctionCall implements Expr {
     }
 
     @Override
+    public String serialize() {
+        return toString();
+    }
+
+    @Override
     public String toString() {
         return function + "(" + arguments.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")";
     }

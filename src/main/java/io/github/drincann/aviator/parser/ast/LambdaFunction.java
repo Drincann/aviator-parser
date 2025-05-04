@@ -36,6 +36,11 @@ public class LambdaFunction implements Expr {
     }
 
     @Override
+    public String serialize() {
+        return toString();
+    }
+
+    @Override
     public String toString() {
         return "lambda (" + String.join(", ", parameters) + ") -> " + body + " end";
     }

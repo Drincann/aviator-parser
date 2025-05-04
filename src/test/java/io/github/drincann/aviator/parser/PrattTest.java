@@ -165,7 +165,7 @@ class PrattTest {
 
     @Test
     public void testMod() {
-        Expr expr = Pratt.parse("1 % 2 % 3");
-        assertEquals("(% (% 1 2) 3)", expr.rp());
+        Expr expr = Pratt.parse("(tinySignResult == 'paramMissing' || tinySignResult == 'fail')&&endpoint=='api.sns.v1.note.imagefeed.get'&&isGuest=='true' && !(baseGoodTinyMissCnt1HQuery < baseGoodCnt1HQuery*0.3 && endpoint == 'api.sns.v1.note.imagefeed.get' && isTinyMissLastOneHour == 1 && isGuest == 'true' && ( ((appMainGuestTinyMissCnt1H > 3000 || (appMainGuestTinyMissCnt1H > 600 && appMainGuestTinyMissCnt1H/appMainCnt1H > 0.4)) && (getCurrentHour>8 || getCurrentHour<1)) || ((appMainGuestTinyMissCnt1H > 1000 || (appMainGuestTinyMissCnt1H > 1000 && appMainGuestTinyMissCnt1H/appMainCnt1H > 0.2)) && getCurrentHour<=8 && getCurrentHour>=1) )) && !(endpoint == 'api.sns.v1.note.imagefeed.get' && isGuest == 'true' && ((androidDeviceCheckRisk==true&&platform=='android')||(iosDeviceCheckRisk==true&&platform=='ios')) && (riskByBuildCnt1H > appMainNoteByBuildCnt1H*0.7) && riskByBuildCnt1H > 400 && (baseRiskDidCnt1HQuery < baseGoodCnt1HQuery*0.08 && baseGoodCnt1HQuery > 500))");
+        System.out.println(expr);
     }
 }

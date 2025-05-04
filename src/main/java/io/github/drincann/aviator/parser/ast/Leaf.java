@@ -27,6 +27,12 @@ public class Leaf implements Expr {
         return new ArrayList<>();
     }
 
+
+    @Override
+    public String serialize() {
+        return toString();
+    }
+
     @Override
     public String toString() {
         return token.getLexeme();

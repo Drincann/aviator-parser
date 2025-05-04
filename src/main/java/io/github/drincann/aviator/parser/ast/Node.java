@@ -56,6 +56,11 @@ public class Node implements Expr {
     }
 
     @Override
+    public String serialize() {
+        return toString();
+    }
+
+    @Override
     public String toString() {
         if (operands.size() == 1) {
             return "(" + operator.getLexeme() + operands.get(0) + ")";
