@@ -1,16 +1,22 @@
-package io.github.drincann.aviator.executor;
+package io.github.drincann.aviator.executor.node.impl;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.github.drincann.aviator.executor.node.PendingExecution;
 import io.github.drincann.aviator.executor.runtime.ExpressionRuntime;
 import io.github.drincann.aviator.lexer.token.AviatorToken;
 import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 import io.github.drincann.aviator.parser.ast.Expr;
 import io.github.drincann.aviator.parser.ast.Leaf;
 
+/**
+ * 对于 ast 中未实现对应 execution 的 node，使用该实现.
+ * 当所有依赖的标识均被 provide 方法传入时，允许执行.
+ * 执行时并使用构造时指定的 runtime.
+ */
 public class ValueExecution implements PendingExecution {
 
     private final Expr node;
@@ -21,14 +27,12 @@ public class ValueExecution implements PendingExecution {
 
     private final Map<String, Object> context;
 
-    private Object resultCache;
+    private Boolean resultCache;
 
     public ValueExecution(ExpressionRuntime runtime, Expr node) {
         this.node = node;
         this.runtime = runtime;
-
         this.context = new ConcurrentHashMap<>();
-
         this.identifiers = new HashSet<>();
 
         node.walk(expr -> {
@@ -55,9 +59,13 @@ public class ValueExecution implements PendingExecution {
     }
 
     @Override
-    public synchronized Object execute() {
+    public synchronized boolean execute() {
         if (resultCache == null) {
-            resultCache = runtime.run(node.serialize(), context);
+            Object result = runtime.run(node.serialize(), context);
+            if (!(result instanceof Boolean)) {
+                throw new RuntimeException("type error");
+            }
+            resultCache = (boolean) result;
         }
 
         return resultCache;

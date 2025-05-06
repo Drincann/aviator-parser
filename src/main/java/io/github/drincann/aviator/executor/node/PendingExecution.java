@@ -1,4 +1,4 @@
-package io.github.drincann.aviator.executor;
+package io.github.drincann.aviator.executor.node;
 
 public interface PendingExecution {
 
@@ -6,5 +6,5 @@ public interface PendingExecution {
 
     boolean canExecute();
 
-    Object execute();
+    boolean execute();
 }

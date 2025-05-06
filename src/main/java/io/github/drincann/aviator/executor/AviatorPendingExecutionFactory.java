@@ -2,6 +2,12 @@ package io.github.drincann.aviator.executor;
 
 import java.util.List;
 
+import io.github.drincann.aviator.executor.node.PendingExecution;
+import io.github.drincann.aviator.executor.node.impl.AndExecution;
+import io.github.drincann.aviator.executor.node.impl.ConditionalExecution;
+import io.github.drincann.aviator.executor.node.impl.NotExecution;
+import io.github.drincann.aviator.executor.node.impl.OrExecution;
+import io.github.drincann.aviator.executor.node.impl.ValueExecution;
 import io.github.drincann.aviator.executor.runtime.ExpressionRuntime;
 import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 import io.github.drincann.aviator.parser.Pratt;
@@ -37,6 +43,18 @@ public class AviatorPendingExecutionFactory {
                 List<Expr> children = node.getChildren();
                 Expr child = children.get(0);
                 return new NotExecution(AviatorPendingExecutionFactory.build(runtime, child));
+            }
+
+            if (node.getOperator().getType() == AviatorTokenType.CONDITIONAL) {
+                List<Expr> children = node.getChildren();
+                Expr condition = children.get(0);
+                Expr thenExpr = children.get(1);
+                Expr elseExpr = children.get(2);
+                return new ConditionalExecution(
+                        AviatorPendingExecutionFactory.build(runtime, condition),
+                        AviatorPendingExecutionFactory.build(runtime, thenExpr),
+                        AviatorPendingExecutionFactory.build(runtime, elseExpr)
+                );
             }
         }
 
