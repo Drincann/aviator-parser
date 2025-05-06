@@ -25,15 +25,6 @@ public class ParserUtil {
                 .collect(Collectors.toList());
     }
 
-    private static boolean allChildrenAreLeafNodes(Expr expr) {
-        for (Expr child : expr.getChildren()) {
-            if (!(child instanceof Leaf)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static List<Expr> split(Expr expr) {
         if (expr instanceof Node) {
             if (operatorIsOr((Node) expr)) {
@@ -51,6 +42,23 @@ public class ParserUtil {
         }
 
         return new ArrayList<Expr>() {{ add(expr); }};
+    }
+
+    public static boolean isExpression(String script) {
+        if (script == null) {
+            return false;
+        }
+
+        return script.contains(";");
+    }
+
+    private static boolean allChildrenAreLeafNodes(Expr expr) {
+        for (Expr child : expr.getChildren()) {
+            if (!(child instanceof Leaf)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean operatorIsAnd(Node expr) {
