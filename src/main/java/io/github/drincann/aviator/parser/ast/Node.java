@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.drincann.aviator.lexer.token.AviatorToken;
-import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 
 public class Node implements Expr {
     private AviatorToken operator;

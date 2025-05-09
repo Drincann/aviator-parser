@@ -159,9 +159,9 @@ public class Pratt {
     private LambdaFunction lambda() {
         eat(LAMBDA);
         eat(LEFT_PAREN);
-        List<String> parameters = new ArrayList<>();
+        List<AviatorToken> parameters = new ArrayList<>();
         while (!tokenIs(RIGHT_PAREN)) {
-            parameters.add(next().getLexeme());
+            parameters.add(next());
             if (peek(RIGHT_PAREN)) {
                 break;
             }

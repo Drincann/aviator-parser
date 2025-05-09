@@ -37,7 +37,10 @@ public class FunctionCall implements Expr {
 
     @Override
     public List<Expr> getChildren() {
-        return new ArrayList<>(arguments);
+        List<Expr> children = new ArrayList<>();
+        children.add(function);
+        children.addAll(arguments);
+        return children;
     }
 
     @Override

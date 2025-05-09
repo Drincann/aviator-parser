@@ -16,14 +16,4 @@ public interface Expr {
      * 序列化到文本
      */
     String serialize();
-
-    default Expr walk(Consumer<Expr> walker) {
-        for (Expr child : this.getChildren()) {
-            walker.accept(child.walk(walker));
-        }
-
-        walker.accept(this);
-
-        return this;
-    }
 }

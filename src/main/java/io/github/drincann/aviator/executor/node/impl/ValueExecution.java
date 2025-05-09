@@ -1,16 +1,21 @@
 package io.github.drincann.aviator.executor.node.impl;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import io.github.drincann.aviator.executor.node.PendingExecution;
 import io.github.drincann.aviator.executor.runtime.ExpressionRuntime;
 import io.github.drincann.aviator.lexer.token.AviatorToken;
 import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 import io.github.drincann.aviator.parser.ast.Expr;
+import io.github.drincann.aviator.parser.ast.FunctionCall;
+import io.github.drincann.aviator.parser.ast.LambdaFunction;
 import io.github.drincann.aviator.parser.ast.Leaf;
+import io.github.drincann.aviator.parser.ast.Node;
+import io.github.drincann.aviator.util.ScopedSet;
 
 /**
  * 对于 ast 中未实现对应 execution 的 node，使用该实现.
@@ -23,7 +28,7 @@ public class ValueExecution implements PendingExecution {
 
     private final ExpressionRuntime runtime;
 
-    private final Set<String> identifiers;
+    final Set<String> identifiers;
 
     private final Map<String, Object> context;
 
@@ -33,16 +38,70 @@ public class ValueExecution implements PendingExecution {
         this.node = node;
         this.runtime = runtime;
         this.context = new ConcurrentHashMap<>();
-        this.identifiers = new HashSet<>();
+        this.identifiers = extractGlobalVars(node);
+    }
 
-        node.walk(expr -> {
-            if (expr instanceof Leaf) {
-                AviatorToken token = ((Leaf) expr).getToken();
-                if (token.getType() == AviatorTokenType.IDENTIFIER) {
-                    identifiers.add(token.getLexeme());
+    private Set<String> extractGlobalVars(Expr expr) {
+        ScopedSet<String> global = ScopedSet.create();
+        dfs(expr, global);
+
+        return global.getScope();
+    }
+
+    private void dfs(Expr expr, ScopedSet<String> vars) {
+        if (expr instanceof Leaf) {
+            AviatorToken token = ((Leaf) expr).getToken();
+            if (token.getType() == AviatorTokenType.IDENTIFIER) {
+                if (!vars.contains(token.getLexeme())) {
+                    addIfNotBuiltin(vars, token.getLexeme());
                 }
             }
-        });
+        }
+
+        if (expr instanceof Node) {
+            Node node = (Node) expr;
+            if (node.getOperator().getType() == AviatorTokenType.DOT) {
+                Expr left = node.getChildren().get(0);
+                if (isIdentifier(left)) {
+                    addIfNotBuiltin(vars, left.toString());
+                    return;
+                }
+            }
+            for (Expr child : expr.getChildren()) {
+                dfs(child, vars);
+            }
+        }
+
+        if (expr instanceof FunctionCall) {
+            FunctionCall functionCall = (FunctionCall) expr;
+            dfs(functionCall.getFunction(), vars);
+            for (Expr arg : functionCall.getArguments()) {
+                dfs(arg, vars);
+            }
+        }
+
+        if (expr instanceof LambdaFunction) {
+            LambdaFunction lambda = (LambdaFunction) expr;
+            ScopedSet<String> lambdaVars = vars.enter();
+            lambdaVars.addAll(toNames(lambda.getParameters()));
+            dfs(((LambdaFunction) expr).getBody(), lambdaVars);
+        }
+    }
+
+    private void addIfNotBuiltin(ScopedSet<String> vars, String identifier) {
+        if (runtime.getBuiltinIdentifiers().contains(identifier)) {
+            return;
+        }
+
+        vars.addTopScope(identifier);
+    }
+
+    private static boolean isIdentifier(Expr left) {
+        return left instanceof Leaf && ((Leaf) left).getToken().getType() == AviatorTokenType.IDENTIFIER;
+    }
+
+    private static List<String> toNames(List<Leaf> parameters) {
+        return parameters.stream().map(Leaf::toString).collect(Collectors.toList());
     }
 
     @Override
