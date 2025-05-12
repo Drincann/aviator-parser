@@ -49,7 +49,7 @@ public class ParserUtil {
             return false;
         }
 
-        return script.contains(";");
+        return !script.contains(";");
     }
 
     private static boolean allChildrenAreLeafNodes(Expr expr) {
