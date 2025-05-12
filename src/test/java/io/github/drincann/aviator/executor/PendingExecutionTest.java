@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import io.github.drincann.aviator.executor.node.PendingExecution;
+import io.github.drincann.aviator.executor.node.impl.DepsCountExecution;
 
 class PendingExecutionTest {
 
@@ -102,6 +103,20 @@ class PendingExecutionTest {
         assertFalse(pending.canExecute());
 
         pending.provide("E", true);
+        assertTrue(pending.canExecute());
+
+        assertEquals(true, pending.execute());
+    }
+
+    @Test
+    public void testDepsCountExecution1() {
+        PendingExecution pending = new DepsCountExecution(new SimpleAviatorRuntime(), "A && B", 2);
+        assertFalse(pending.canExecute());
+
+        pending.provide("A", true);
+        assertFalse(pending.canExecute());
+
+        pending.provide("B", true);
         assertTrue(pending.canExecute());
 
         assertEquals(true, pending.execute());
