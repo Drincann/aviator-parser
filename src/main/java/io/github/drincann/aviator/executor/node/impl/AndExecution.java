@@ -43,18 +43,15 @@ public class AndExecution implements PendingExecution {
     public synchronized boolean execute() {
         if (resultCache == null) {
             if (left.canExecute() && right.canExecute()) {
-
-                resultCache = left.execute() && right.execute();
+                return resultCache = left.execute() && right.execute();
             }
             if (left.canExecute() && !left.execute()) {
-                resultCache = false;
+                return resultCache = false;
             }
             if (right.canExecute() && !right.execute()) {
-                resultCache = false;
+                return resultCache = false;
             }
-        }
 
-        if (resultCache == null) {
             throw new RuntimeException("cannot execute");
         }
 

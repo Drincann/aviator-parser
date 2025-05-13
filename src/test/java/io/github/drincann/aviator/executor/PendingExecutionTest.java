@@ -13,7 +13,7 @@ class PendingExecutionTest {
 
     @Test
     public void testShortCircuit1() {
-        PendingExecution pending = AviatorPendingExecutionFactory.compile(new SimpleAviatorRuntime(), "A || B && C");
+        PendingExecution pending = AviatorPendingExecutionFactory.compile(new SimpleAviatorRuntime(), "A || B || C");
 
         assertFalse(pending.canExecute());
 
@@ -106,6 +106,16 @@ class PendingExecutionTest {
         assertTrue(pending.canExecute());
 
         assertEquals(true, pending.execute());
+    }
+
+    @Test
+    public void testConditionalShortCircuit3() {
+        PendingExecution pending = AviatorPendingExecutionFactory.compile(new SimpleAviatorRuntime(), "webXsCommonEnvCheck != '' && count(string.split(webXsCommonEnvCheck,'\\\\|')) > 9 && string.split(webXsCommonEnvCheck,'\\\\|')[9] == '1' && jailbrokenUserOffline != ''");
+
+        pending.provide("webXsCommonEnvCheck", "");
+
+        assertTrue(pending.canExecute());
+        assertFalse(pending.execute());
     }
 
     @Test

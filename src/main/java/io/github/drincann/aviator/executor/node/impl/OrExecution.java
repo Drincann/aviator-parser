@@ -43,17 +43,15 @@ public class OrExecution implements PendingExecution {
     public synchronized boolean execute() {
         if (resultCache == null) {
             if (left.canExecute() && right.canExecute()) {
-                resultCache = left.execute() || right.execute();
+                return resultCache = left.execute() || right.execute();
             }
             if (left.canExecute() && left.execute()) {
-                resultCache = true;
+                return resultCache = true;
             }
             if (right.canExecute() && right.execute()) {
-                resultCache = true;
+                return resultCache = true;
             }
-        }
 
-        if (resultCache == null) {
             throw new RuntimeException("cannot execute");
         }
 

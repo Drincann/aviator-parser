@@ -45,15 +45,12 @@ public class ConditionalExecution implements PendingExecution {
     public synchronized boolean execute() {
         if (resultCache == null) {
             if (condition.canExecute() && condition.execute() && thenExec.canExecute()) {
-                resultCache = thenExec.execute();
+                return resultCache = thenExec.execute();
             }
-
             if (condition.canExecute() && !condition.execute() && elseExec.canExecute()) {
-                resultCache = elseExec.execute();
+                return resultCache = elseExec.execute();
             }
-        }
 
-        if (resultCache == null) {
             throw new RuntimeException("cannot execute");
         }
 
