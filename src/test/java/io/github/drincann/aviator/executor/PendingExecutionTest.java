@@ -37,6 +37,19 @@ class PendingExecutionTest {
 
     @Test
     public void testShortCircuit3() {
+        PendingExecution pending = AviatorPendingExecutionFactory.compile(new SimpleAviatorRuntime(), "A && !(B && C)");
+
+        assertFalse(pending.canExecute());
+
+        pending.provide("B", true);
+        pending.provide("C", true);
+        assertTrue(pending.canExecute());
+
+        assertEquals(false, pending.execute());
+    }
+
+    @Test
+    public void testShortCircuit4() {
         PendingExecution pending = AviatorPendingExecutionFactory.compile(new SimpleAviatorRuntime(), "(A || !(B && C))");
 
         assertFalse(pending.canExecute());
@@ -48,7 +61,7 @@ class PendingExecutionTest {
     }
 
     @Test
-    public void testShortCircuit4() {
+    public void testShortCircuit5() {
         PendingExecution pending = AviatorPendingExecutionFactory.compile(new SimpleAviatorRuntime(), "(A == 1 || !(B == '2' && C > 3))");
 
         assertFalse(pending.canExecute());
@@ -63,7 +76,7 @@ class PendingExecutionTest {
     }
 
     @Test
-    public void testShortCircuit5() {
+    public void testShortCircuit6() {
         PendingExecution pending = AviatorPendingExecutionFactory.compile(new SimpleAviatorRuntime(), "(A == 1 || !(B == '2' && C > 3))");
 
         assertFalse(pending.canExecute());
