@@ -2,11 +2,11 @@ package io.github.drincann.aviator.executor.node.impl;
 
 import io.github.drincann.aviator.executor.node.PendingExecution;
 
-/**
- * And 操作符的执行结点，允许在一侧值为 false 时短路.
- * 例如对 A && B，当 A 为 false 时，execute 方法将返回 false.
- */
 public class AndExecution implements PendingExecution {
+    /**
+     * And 操作符的执行结点，允许在一侧值为 false 时短路.
+     * 例如对 A && B，当 A 为 false 时，execute 方法将返回 false.
+     */
 
     private final PendingExecution left;
     private final PendingExecution right;

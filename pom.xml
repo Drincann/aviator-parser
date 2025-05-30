@@ -1,23 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.drincann</groupId>
     <artifactId>aviator-parser</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.1</version>
+
+    <name>aviator-parser</name>
+    <description>A Java parser for Aviator expression trees with short-circuit evaluation</description>
+    <url>https://github.com/drincann/avaitor-parser</url>
+
+    <licenses>
+        <license>
+            <name>Do What The F*ck You Want To Public License (WTFPL)</name>
+            <url>http://www.wtfpl.net/</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>drincann</id>
+            <name>drincann</name>
+            <email>1019933576@qq.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/drincann/avaitor-parser</url>
+        <connection>scm:git:git://github.com/drincann/avaitor-parser.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/drincann/avaitor-parser.git</developerConnection>
+    </scm>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -42,26 +69,48 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <phase>package</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>nexus snapshot repository</name>
-            <url>https://artifactory.devops.xiaohongshu.com/artifactory/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>releases</id>
-            <name>nexus repository</name>
-            <url>https://artifactory.devops.xiaohongshu.com/artifactory/maven-releases/</url>
-        </repository>
-    </distributionManagement>
 </project>
