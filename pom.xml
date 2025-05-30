@@ -6,7 +6,7 @@
 
     <groupId>io.github.drincann</groupId>
     <artifactId>aviator-parser</artifactId>
-    <version>0.5.1</version>
+    <version>0.5.1-testci</version>
 
     <name>aviator-parser</name>
     <description>A Java parser for Aviator expression trees with short-circuit evaluation</description>
