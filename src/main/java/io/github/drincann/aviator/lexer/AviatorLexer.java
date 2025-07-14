@@ -381,10 +381,10 @@ public class AviatorLexer {
         }
 
         if (peek() == 'e' || peek() == 'E') { // 指数
-            nextChar(); // skip current digit
+            nextChar(); // move to 'e' or 'E'
             nextChar(); // skip 'e' or 'E'
-            if (currentChar() == '-') {
-                nextChar(); // skip '+' or '-'
+            if (currentChar() == '-' || currentChar() == '+') {
+                nextChar(); // skip sign
             }
 
             untilNonMatch(LexerUtil::isDigit); // skip valid digit
