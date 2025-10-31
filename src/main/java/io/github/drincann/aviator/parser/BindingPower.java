@@ -1,6 +1,7 @@
 package io.github.drincann.aviator.parser;
 
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.ADD;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.ASSIGN;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.CONDITIONAL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DIVIDE;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DOT;
@@ -35,6 +36,7 @@ public class BindingPower {
                     CONDITIONAL, 2,
                     LOGIC_OR, 3,
                     LOGIC_AND, 5,
+                    ASSIGN, 6,
                     LIKE, 7,
                     EQUAL, 9, NOT_EQUAL, 9,
                     GREATER_THAN, 11, GREATER_THAN_EQUAL, 11, LESS_THAN, 11, LESS_THAN_EQUAL, 11,
@@ -45,6 +47,7 @@ public class BindingPower {
             );
     static final Map<AviatorTokenType, Integer> INFIX_OPERATOR_RIGHT_BINDING_POWER =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
+                    ASSIGN, 0,
                     CONDITIONAL, 1,
                     LOGIC_OR, 4,
                     LOGIC_AND, 6,
