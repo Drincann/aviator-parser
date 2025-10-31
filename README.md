@@ -12,7 +12,7 @@ This library also includes a **short-circuit evaluator**, implemented as a demon
 <dependency>
   <groupId>io.github.drincann</groupId>
   <artifactId>aviator-parser</artifactId>
-  <version>0.5.1</version>
+  <version>0.6.0</version>
 </dependency>
 ```
 
