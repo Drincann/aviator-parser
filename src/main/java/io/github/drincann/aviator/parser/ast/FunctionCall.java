@@ -1,55 +1,54 @@
 package io.github.drincann.aviator.parser.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class FunctionCall implements Expr {
-    private Expr function;
-    private List<Expr> arguments;
+public final class FunctionCall implements Expr {
+    private final Expr function;
+    private final List<Expr> arguments;
+    private final List<Expr> children;
+
+    public FunctionCall(Expr function, List<Expr> arguments) {
+        this.function = Objects.requireNonNull(function, "function");
+        this.arguments = Collections.unmodifiableList(new ArrayList<>(arguments));
+        List<Expr> allChildren = new ArrayList<>(arguments.size() + 1);
+        allChildren.add(function);
+        allChildren.addAll(arguments);
+        this.children = Collections.unmodifiableList(allChildren);
+    }
 
     public Expr getFunction() {
         return function;
-    }
-
-    public FunctionCall setFunction(Expr function) {
-        this.function = function;
-        return this;
     }
 
     public List<Expr> getArguments() {
         return arguments;
     }
 
-    public FunctionCall setArguments(List<Expr> arguments) {
-        this.arguments = arguments;
-        return this;
-    }
-
     @Override
     public String rp() {
-        return "(" + function.rp() + flatArgs() + ")";
-    }
-
-    private String flatArgs() {
-        return arguments.stream().map(t -> " " + t.rp()).collect(Collectors.joining());
+        return "(" + function.rp()
+                + arguments.stream().map(argument -> " " + argument.rp()).collect(Collectors.joining())
+                + ")";
     }
 
     @Override
     public List<Expr> getChildren() {
-        List<Expr> children = new ArrayList<>();
-        children.add(function);
-        children.addAll(arguments);
         return children;
     }
 
     @Override
     public String serialize() {
-        return toString();
+        return function.serialize() + "("
+                + arguments.stream().map(Expr::serialize).collect(Collectors.joining(", "))
+                + ")";
     }
 
     @Override
     public String toString() {
-        return function + "(" + arguments.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")";
+        return serialize();
     }
 }

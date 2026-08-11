@@ -46,15 +46,9 @@ public enum AviatorTokenType {
     ASSIGN /* = */,
 
     // 字面量
-    IDENTIFIER, // ::= <identifier_start>+ <identifier_rest>*
-    // <identifier_start> ::= _ | [a-z] | [A-Z]
-    // <identifier_rest> ::= <identifier_start> | [0-9]
+    IDENTIFIER, // Java identifier, dotted name, #name, or #`quoted-name`
 
-    NUMBER, // ::= <hex_number> | <decimal_number>
-    // <hex_number> ::= 0x<hex_digit>+
-    // <decimal_number> ::= <digit>+
-    // <digit> ::= [0-9]
-    // <hex_digit> ::= <digit> | [a-f] | [A-F]
+    NUMBER, // hexadecimal, decimal/scientific, BigDecimal M, or BigInteger N
 
     STRING, // ::= (<single_quoted_string> | <double_quoted_string>)
     // <single_quoted_string> ::= '<string_content>'

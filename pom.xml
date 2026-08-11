@@ -6,11 +6,11 @@
 
     <groupId>io.github.drincann</groupId>
     <artifactId>aviator-parser</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
 
     <name>aviator-parser</name>
     <description>A Java parser for Aviator expression trees with short-circuit evaluation</description>
-    <url>https://github.com/drincann/avaitor-parser</url>
+    <url>https://github.com/Drincann/aviator-parser</url>
 
     <licenses>
         <license>
@@ -29,9 +29,9 @@
     </developers>
 
     <scm>
-        <url>https://github.com/drincann/avaitor-parser</url>
-        <connection>scm:git:git://github.com/drincann/avaitor-parser.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/drincann/avaitor-parser.git</developerConnection>
+        <url>https://github.com/Drincann/aviator-parser</url>
+        <connection>scm:git:https://github.com/Drincann/aviator-parser.git</connection>
+        <developerConnection>scm:git:git@github.com:Drincann/aviator-parser.git</developerConnection>
     </scm>
 
     <properties>
@@ -56,7 +56,8 @@
         <dependency>
             <groupId>com.googlecode.aviator</groupId>
             <artifactId>aviator</artifactId>
-            <version>5.4.3</version>
+            <version>5.4.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

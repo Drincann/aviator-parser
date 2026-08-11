@@ -1,22 +1,26 @@
 package io.github.drincann.aviator.util;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.drincann.aviator.lexer.token.AviatorTokenType;
+import io.github.drincann.aviator.parser.Pratt;
 import io.github.drincann.aviator.parser.ast.Expr;
 import io.github.drincann.aviator.parser.ast.Leaf;
 import io.github.drincann.aviator.parser.ast.Node;
 
-public class ParserUtil {
+public final class ParserUtil {
+    private ParserUtil() {
+    }
+
     public static List<Expr> getLeafParentNodes(Expr expr) {
         if (expr instanceof Leaf) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         if (allChildrenAreLeafNodes(expr)) {
-            return new ArrayList<Expr>() {{ add(expr); }};
+            return Collections.singletonList(expr);
         }
 
         return expr.getChildren().stream()
@@ -28,20 +32,18 @@ public class ParserUtil {
     public static List<Expr> split(Expr expr) {
         if (expr instanceof Node) {
             if (operatorIsOr((Node) expr)) {
-                return new ArrayList<Expr>() {{ add(expr); }};
+                return Collections.singletonList(expr);
             }
 
             if (operatorIsAnd((Node) expr)) {
-                return new ArrayList<Expr>() {{
-                    addAll(expr.getChildren().stream()
-                            .map(ParserUtil::split)
-                            .flatMap(List::stream)
-                            .collect(Collectors.toList()));
-                }};
+                return expr.getChildren().stream()
+                        .map(ParserUtil::split)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
             }
         }
 
-        return new ArrayList<Expr>() {{ add(expr); }};
+        return Collections.singletonList(expr);
     }
 
     public static boolean isExpression(String script) {
@@ -49,7 +51,12 @@ public class ParserUtil {
             return false;
         }
 
-        return !script.contains(";");
+        try {
+            Pratt.parse(script);
+            return true;
+        } catch (RuntimeException ignored) {
+            return false;
+        }
     }
 
     private static boolean allChildrenAreLeafNodes(Expr expr) {

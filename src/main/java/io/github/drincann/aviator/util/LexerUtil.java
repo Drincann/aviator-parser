@@ -1,36 +1,27 @@
 package io.github.drincann.aviator.util;
 
-public class LexerUtil {
-    public static boolean isIdentifierStart(char ch) {
-        return isAlpha(ch) || ch == '_';
+public final class LexerUtil {
+    private LexerUtil() {
     }
 
-    public static boolean isIdentifierRest(char ch) {
-        return isAlpha(ch) || isDigit(ch) || ch == '_';
+    public static boolean isIdentifierStart(int codePoint) {
+        return Character.isJavaIdentifierStart(codePoint);
     }
 
-    public static boolean isNotIdentifierStart(char ch) {
-        return !isIdentifierStart(ch);
-    }
-
-    public static boolean isNumberLiteralStart(char ch) {
-        return isDigit(ch) || ch == '.';
+    public static boolean isIdentifierRest(int codePoint) {
+        return Character.isJavaIdentifierPart(codePoint);
     }
 
     public static boolean isStringLiteralStart(char ch) {
         return ch == '\'' || ch == '"';
     }
 
-    public static boolean isNotEOL(char ch) {
-        return ch != '\n' && ch != '\r';
-    }
-
     public static boolean isWhiteSpace(char ch) {
-        return ch ==' ' || ch == '\t' || ch == '\f' || ch == '\b' || ch == '\n' || ch == '\r';
+        return ch == ' ' || ch == '\t' || ch == '\f' || ch == '\b' || ch == '\n' || ch == '\r';
     }
 
     public static boolean isDigit(char ch) {
-        return ch >= '0' && ch <= '9';
+        return Character.isDigit(ch);
     }
 
     public static String toPrintable(char ch) {
@@ -45,6 +36,8 @@ public class LexerUtil {
                 return "\\f";
             case '\b':
                 return "\\b";
+            case 0:
+                return "EOF";
             default:
                 return String.valueOf(ch);
         }
@@ -52,9 +45,5 @@ public class LexerUtil {
 
     public static boolean isHexDigit(char ch) {
         return isDigit(ch) || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F';
-    }
-
-    private static boolean isAlpha(char ch) {
-        return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z';
     }
 }

@@ -12,7 +12,7 @@ This library also includes a **short-circuit evaluator**, implemented as a demon
 <dependency>
   <groupId>io.github.drincann</groupId>
   <artifactId>aviator-parser</artifactId>
-  <version>0.6.0</version>
+  <version>0.7.0</version>
 </dependency>
 ```
 
@@ -26,7 +26,8 @@ mvn clean verify
 
 - Pratt Parsing for operator precedence and associativity
 
-- Composable AST with distinct types: Node, Leaf, FunctionCall, LambdaFunction
+- Immutable AST with distinct nodes for operators, calls, lambdas, variadic parameters,
+  argument unpacking, and first-class operator references
 
 - Reverse Polish Notation (RPN) and serialization utilities
 
@@ -42,7 +43,7 @@ This parser is designed for expression-style Aviator syntax (i.e., non-Turing-co
 Expr ast = Pratt.parse("A == 1 ? (lambda (x) -> x + 1 end)(1) : func_call(a, b)");
 
 System.out.println("Serialized: " + ast.serialize()); 
-// Output: (A == 1) ? lambda (x) -> (x + 1) end(1):func_call(a, b))
+// Output: ((A == 1) ? lambda (x) -> (x + 1) end(1) : func_call(a, b))
 
 System.out.println("Reverse Polish Notation: " + ast.rp()); 
 // Output: (? (== A 1) (lambda (x) -> (+ x 1) end 1) (func_call a b))
@@ -118,11 +119,17 @@ The parser is based on Pratt's top-down operator precedence parsing. It supports
 
 - Arithmetic, logical, and comparison operations
 
-- Function calls and lambdas
+- Function calls, argument unpacking, variadic lambdas, and operator references
 
 - Conditional (ternary) expressions
 
+- Numeric forms, regexes, quoted identifiers, comments, bit operations,
+  shifts, exponentiation, indexing, and assignment expressions
+
 This design enables modular parsing without deep recursion or grammar ambiguity.
+
+Statement scripts (`if`, `let`, `return`, named `fn`, loops, and exception handling) are
+intentionally outside this parser's expression boundary.
 
 ## Contributing
 

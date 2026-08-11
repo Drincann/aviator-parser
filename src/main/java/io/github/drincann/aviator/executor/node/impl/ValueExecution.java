@@ -13,8 +13,8 @@ import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 import io.github.drincann.aviator.parser.ast.Expr;
 import io.github.drincann.aviator.parser.ast.FunctionCall;
 import io.github.drincann.aviator.parser.ast.LambdaFunction;
+import io.github.drincann.aviator.parser.ast.LambdaParameter;
 import io.github.drincann.aviator.parser.ast.Leaf;
-import io.github.drincann.aviator.parser.ast.Node;
 import io.github.drincann.aviator.util.ScopedSet;
 
 /**
@@ -52,24 +52,11 @@ public class ValueExecution implements PendingExecution {
         if (expr instanceof Leaf) {
             AviatorToken token = ((Leaf) expr).getToken();
             if (token.getType() == AviatorTokenType.IDENTIFIER) {
-                if (!vars.contains(token.getLexeme())) {
-                    addIfNotBuiltin(vars, token.getLexeme());
+                if (!vars.contains(token.getValue())) {
+                    addIfNotBuiltin(vars, token.getValue());
                 }
             }
-        }
-
-        if (expr instanceof Node) {
-            Node node = (Node) expr;
-            if (node.getOperator().getType() == AviatorTokenType.DOT) {
-                Expr left = node.getChildren().get(0);
-                if (isIdentifier(left)) {
-                    addIfNotBuiltin(vars, left.toString());
-                    return;
-                }
-            }
-            for (Expr child : expr.getChildren()) {
-                dfs(child, vars);
-            }
+            return;
         }
 
         if (expr instanceof FunctionCall) {
@@ -78,30 +65,34 @@ public class ValueExecution implements PendingExecution {
             for (Expr arg : functionCall.getArguments()) {
                 dfs(arg, vars);
             }
+            return;
         }
 
         if (expr instanceof LambdaFunction) {
             LambdaFunction lambda = (LambdaFunction) expr;
             ScopedSet<String> lambdaVars = vars.enter();
             lambdaVars.addAll(toNames(lambda.getParameters()));
-            dfs(((LambdaFunction) expr).getBody(), lambdaVars);
+            dfs(lambda.getBody(), lambdaVars);
+            return;
+        }
+
+        for (Expr child : expr.getChildren()) {
+            dfs(child, vars);
         }
     }
 
     private void addIfNotBuiltin(ScopedSet<String> vars, String identifier) {
-        if (runtime.getBuiltinIdentifiers().contains(identifier)) {
+        String namespace = identifier.contains(".") ? identifier.substring(0, identifier.indexOf('.')) : identifier;
+        if (runtime.getBuiltinIdentifiers().contains(identifier)
+                || runtime.getBuiltinIdentifiers().contains(namespace)) {
             return;
         }
 
         vars.addTopScope(identifier);
     }
 
-    private static boolean isIdentifier(Expr left) {
-        return left instanceof Leaf && ((Leaf) left).getToken().getType() == AviatorTokenType.IDENTIFIER;
-    }
-
-    private static List<String> toNames(List<Leaf> parameters) {
-        return parameters.stream().map(Leaf::toString).collect(Collectors.toList());
+    private static List<String> toNames(List<LambdaParameter> parameters) {
+        return parameters.stream().map(LambdaParameter::getName).collect(Collectors.toList());
     }
 
     @Override

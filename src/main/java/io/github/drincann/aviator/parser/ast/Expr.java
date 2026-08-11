@@ -1,7 +1,6 @@
 package io.github.drincann.aviator.parser.ast;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public interface Expr {
 
@@ -9,11 +8,15 @@ public interface Expr {
 
     /**
      * 序列化到逆波兰形式文本
+     *
+     * @return reverse Polish representation of this expression
      */
     String rp();
 
     /**
      * 序列化到文本
+     *
+     * @return Aviator expression preserving this AST's semantics
      */
     String serialize();
 }

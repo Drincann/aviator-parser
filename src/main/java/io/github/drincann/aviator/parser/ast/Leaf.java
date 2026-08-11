@@ -1,20 +1,20 @@
 package io.github.drincann.aviator.parser.ast;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import io.github.drincann.aviator.lexer.token.AviatorToken;
 
-public class Leaf implements Expr {
-    private AviatorToken token;
+public final class Leaf implements Expr {
+    private final AviatorToken token;
+
+    public Leaf(AviatorToken token) {
+        this.token = Objects.requireNonNull(token, "token");
+    }
 
     public AviatorToken getToken() {
         return token;
-    }
-
-    public Leaf setToken(AviatorToken token) {
-        this.token = token;
-        return this;
     }
 
     @Override
@@ -24,17 +24,16 @@ public class Leaf implements Expr {
 
     @Override
     public List<Expr> getChildren() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
-
 
     @Override
     public String serialize() {
-        return toString();
+        return token.getLexeme();
     }
 
     @Override
     public String toString() {
-        return token.getLexeme();
+        return serialize();
     }
 }
