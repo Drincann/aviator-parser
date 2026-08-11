@@ -1,54 +1,48 @@
 package io.github.drincann.aviator.parser.ast;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.github.drincann.aviator.lexer.token.AviatorToken;
+public final class LambdaFunction implements Expr {
+    private final List<LambdaParameter> parameters;
+    private final Expr body;
 
-public class LambdaFunction implements Expr {
-    private List<Leaf> parameters;
-    private Expr body;
-
-    public List<Leaf> getParameters() {
-        return parameters;
+    public LambdaFunction(List<LambdaParameter> parameters, Expr body) {
+        this.parameters = Collections.unmodifiableList(new ArrayList<>(parameters));
+        this.body = Objects.requireNonNull(body, "body");
     }
 
-    public LambdaFunction setParameters(List<AviatorToken> parameters) {
-        this.parameters = parameters.stream().map(token -> new Leaf().setToken(token)).collect(Collectors.toList());
-        return this;
+    public List<LambdaParameter> getParameters() {
+        return parameters;
     }
 
     public Expr getBody() {
         return body;
     }
 
-    public LambdaFunction setBody(Expr body) {
-        this.body = body;
-        return this;
-    }
-
     @Override
     public String rp() {
-        return "lambda (" + String.join(" ", toStringList(parameters)) + ") -> " + body.rp() + " end";
-    }
-
-    private List<String> toStringList(List<Leaf> parameters) {
-        return parameters.stream().map(Leaf::toString).collect(Collectors.toList());
+        return "lambda (" + parameters.stream().map(LambdaParameter::serialize).collect(Collectors.joining(" "))
+                + ") -> " + body.rp() + " end";
     }
 
     @Override
     public List<Expr> getChildren() {
-        return new ArrayList<Expr>() {{ add(body); }};
+        return Collections.singletonList(body);
     }
 
     @Override
     public String serialize() {
-        return toString();
+        return "lambda ("
+                + parameters.stream().map(LambdaParameter::serialize).collect(Collectors.joining(", "))
+                + ") -> " + body.serialize() + " end";
     }
 
     @Override
     public String toString() {
-        return "lambda (" + String.join(", ", toStringList(parameters)) + ") -> " + body + " end";
+        return serialize();
     }
 }

@@ -1,6 +1,8 @@
 package io.github.drincann.aviator.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -10,6 +12,19 @@ import io.github.drincann.aviator.parser.Pratt;
 import io.github.drincann.aviator.parser.ast.Expr;
 
 class ParserUtilTest {
+    @Test
+    void identifiesExpressionsByParsingTheCompleteInput() {
+        assertTrue(ParserUtil.isExpression("a == b && c > d"));
+        assertTrue(ParserUtil.isExpression("'a;b' == value"));
+        assertTrue(ParserUtil.isExpression("text =~ /a;b/"));
+        assertTrue(ParserUtil.isExpression("result = score > 10 ? 'high' : 'low'"));
+
+        assertFalse(ParserUtil.isExpression("if score > 10 { return true; }"));
+        assertFalse(ParserUtil.isExpression("return true"));
+        assertFalse(ParserUtil.isExpression("a == b trailing"));
+        assertFalse(ParserUtil.isExpression(null));
+    }
+
     @Test
     public void testSplitAnd() {
         Expr parsed = Pratt.parse("A == 1 && (B == 2 || C.D == true) && E == 'hello'");

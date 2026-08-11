@@ -1,6 +1,5 @@
 package io.github.drincann.aviator.lexer.token;
 
-import static io.github.drincann.aviator.lexer.token.AviatorTokenType.ARROW;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.BREAK;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.CATCH;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.CONTINUE;
@@ -28,74 +27,77 @@ import static io.github.drincann.aviator.util.CollectionUtil.map;
 import java.util.Map;
 import java.util.Objects;
 
-public class AviatorToken {
+/** An immutable lexical token with both its source spelling and semantic value. */
+public final class AviatorToken {
     public static final Map<String, AviatorTokenType> KEYWORDS_MAP =
             map(String.class, AviatorTokenType.class,
                     "if", IF, "else", ELSE, "elsif", ELSE_IF,
-
                     "for", FOR, "in", IN, "while", WHILE,
                     "break", BREAK, "continue", CONTINUE, "return", RETURN,
-
                     "try", TRY, "catch", CATCH, "finally", FINALLY, "throw", THROW,
-
-                    "fn", FN, "lambda", LAMBDA, "->", ARROW, "end", END,
-
+                    "fn", FN, "lambda", LAMBDA, "end", END,
                     "true", TRUE, "false", FALSE, "nil", NIL,
-
                     "let", LET, "new", NEW, "use", USE
             );
 
-    private AviatorTokenType type;
-    private String lexeme;
+    private final AviatorTokenType type;
+    private final String lexeme;
+    private final String value;
+    private final int start;
+    private final int end;
+    private final int line;
 
-    // meta
-    private Integer start; // token 开始的第一个字符的位置
-    private Integer end; // token 结束的下一个字符的位置
-    private Integer line; // token 所在行号（目前 token 不会跨行）
+    public AviatorToken(AviatorTokenType type, String lexeme, int start, int end, int line) {
+        this(type, lexeme, lexeme, start, end, line);
+    }
+
+    public AviatorToken(
+            AviatorTokenType type,
+            String lexeme,
+            String value,
+            int start,
+            int end,
+            int line) {
+        this.type = Objects.requireNonNull(type, "type");
+        this.lexeme = Objects.requireNonNull(lexeme, "lexeme");
+        this.value = Objects.requireNonNull(value, "value");
+        this.start = start;
+        this.end = end;
+        this.line = line;
+    }
 
     public AviatorTokenType getType() {
         return type;
     }
 
-    public AviatorToken setType(AviatorTokenType type) {
-        this.type = type;
-        return this;
-    }
-
+    /**
+     * Returns the exact source spelling, except that whitespace-separated operators are canonicalized.
+     *
+     * @return token spelling used for lossless expression serialization
+     */
     public String getLexeme() {
         return lexeme;
     }
 
-    public AviatorToken setLexeme(String lexeme) {
-        this.lexeme = lexeme;
-        return this;
+    /**
+     * Returns the semantic value. It differs from lexeme for quoted identifiers.
+     *
+     * @return value used for identifier lookup and AST analysis
+     */
+    public String getValue() {
+        return value;
     }
 
-    public Integer getStart() {
+    public int getStart() {
         return start;
     }
 
-    public AviatorToken setStart(Integer start) {
-        this.start = start;
-        return this;
-    }
-
-    public Integer getEnd() {
+    public int getEnd() {
         return end;
     }
 
-    public AviatorToken setEnd(Integer end) {
-        this.end = end;
-        return this;
-    }
-
-    public Integer getLine() {
+    public int getLine() {
         return line;
-    }
-
-    public AviatorToken setLine(Integer line) {
-        this.line = line;
-        return this;
     }
 
     @Override
@@ -103,6 +105,7 @@ public class AviatorToken {
         return "AviatorToken{"
                 + "type=" + type
                 + ", lexeme='" + lexeme + '\''
+                + ", value='" + value + '\''
                 + ", start=" + start
                 + ", end=" + end
                 + ", line=" + line
@@ -110,20 +113,24 @@ public class AviatorToken {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(other instanceof AviatorToken)) {
             return false;
         }
-        AviatorToken that = (AviatorToken) o;
-        return type == that.type && Objects.equals(lexeme, that.lexeme) && Objects.equals(start, that.start)
-                && Objects.equals(end, that.end) && Objects.equals(line, that.line);
+        AviatorToken that = (AviatorToken) other;
+        return start == that.start
+                && end == that.end
+                && line == that.line
+                && type == that.type
+                && lexeme.equals(that.lexeme)
+                && value.equals(that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, lexeme, start, end, line);
+        return Objects.hash(type, lexeme, value, start, end, line);
     }
 }

@@ -2,9 +2,12 @@ package io.github.drincann.aviator.parser;
 
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.ADD;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.ASSIGN;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.BIT_AND;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.BIT_NOT;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.BIT_OR;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.BIT_XOR;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.CONDITIONAL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DIVIDE;
-import static io.github.drincann.aviator.lexer.token.AviatorTokenType.DOT;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.EQUAL;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.GREATER_THAN;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.GREATER_THAN_EQUAL;
@@ -19,7 +22,11 @@ import static io.github.drincann.aviator.lexer.token.AviatorTokenType.LOGIC_OR;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.MOD;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.MULTIPLY;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.NOT_EQUAL;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.POW;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.SIGNED_BIT_SHIFT_LEFT;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.SIGNED_BIT_SHIFT_RIGHT;
 import static io.github.drincann.aviator.lexer.token.AviatorTokenType.SUBTRACT;
+import static io.github.drincann.aviator.lexer.token.AviatorTokenType.UNSIGNED_BIT_SHIFT_RIGHT;
 
 import java.util.Map;
 
@@ -27,69 +34,78 @@ import io.github.drincann.aviator.lexer.token.AviatorToken;
 import io.github.drincann.aviator.lexer.token.AviatorTokenType;
 import io.github.drincann.aviator.util.CollectionUtil;
 
-/**
- * Binding power config of operators
- */
-public class BindingPower {
-    static final Map<AviatorTokenType, Integer> INFIX_OPERATOR_LEFT_BINDING_POWER =
+/** AviatorScript 5.4.1 binding powers. */
+final class BindingPower {
+    private static final Map<AviatorTokenType, Integer> INFIX_LEFT =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
                     CONDITIONAL, 2,
                     LOGIC_OR, 3,
                     LOGIC_AND, 5,
-                    ASSIGN, 6,
-                    LIKE, 7,
-                    EQUAL, 9, NOT_EQUAL, 9,
-                    GREATER_THAN, 11, GREATER_THAN_EQUAL, 11, LESS_THAN, 11, LESS_THAN_EQUAL, 11,
-                    ADD, 13, SUBTRACT, 13,
-                    MOD, 15,
-                    MULTIPLY, 17, DIVIDE, 17,
-                    DOT, 19
+                    BIT_OR, 7,
+                    BIT_XOR, 9,
+                    BIT_AND, 11,
+                    ASSIGN, 13, LIKE, 13, EQUAL, 13, NOT_EQUAL, 13,
+                    GREATER_THAN, 15, GREATER_THAN_EQUAL, 15, LESS_THAN, 15, LESS_THAN_EQUAL, 15,
+                    SIGNED_BIT_SHIFT_LEFT, 17, SIGNED_BIT_SHIFT_RIGHT, 17, UNSIGNED_BIT_SHIFT_RIGHT, 17,
+                    ADD, 19, SUBTRACT, 19,
+                    MULTIPLY, 21, DIVIDE, 21, MOD, 21,
+                    POW, 25
             );
-    static final Map<AviatorTokenType, Integer> INFIX_OPERATOR_RIGHT_BINDING_POWER =
+
+    private static final Map<AviatorTokenType, Integer> INFIX_RIGHT =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
-                    ASSIGN, 0,
                     CONDITIONAL, 1,
                     LOGIC_OR, 4,
                     LOGIC_AND, 6,
-                    LIKE, 8,
-                    EQUAL, 10, NOT_EQUAL, 10,
-                    GREATER_THAN, 12, GREATER_THAN_EQUAL, 12, LESS_THAN, 12, LESS_THAN_EQUAL, 12,
-                    ADD, 14, SUBTRACT, 14,
-                    MOD, 16,
-                    MULTIPLY, 18, DIVIDE, 18,
-                    DOT, 20
+                    BIT_OR, 8,
+                    BIT_XOR, 10,
+                    BIT_AND, 12,
+                    ASSIGN, 0, LIKE, 14, EQUAL, 14, NOT_EQUAL, 14,
+                    GREATER_THAN, 16, GREATER_THAN_EQUAL, 16, LESS_THAN, 16, LESS_THAN_EQUAL, 16,
+                    SIGNED_BIT_SHIFT_LEFT, 18, SIGNED_BIT_SHIFT_RIGHT, 18, UNSIGNED_BIT_SHIFT_RIGHT, 18,
+                    ADD, 20, SUBTRACT, 20,
+                    MULTIPLY, 22, DIVIDE, 22, MOD, 22,
+                    // Exponentiation is right associative and accepts a unary expression on its right.
+                    POW, 23
             );
-    static final Map<AviatorTokenType, Integer> PREFIX_OPERATOR_BINDING_POWER =
+
+    private static final Map<AviatorTokenType, Integer> PREFIX =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
-                    SUBTRACT, 19,
-                    LOGIC_NOT, 19
+                    SUBTRACT, 23,
+                    LOGIC_NOT, 23,
+                    BIT_NOT, 23
             );
-    static final Map<AviatorTokenType, Integer> POSTFIX_OPERATOR_BINDING_POWER =
+
+    private static final Map<AviatorTokenType, Integer> POSTFIX =
             CollectionUtil.map(AviatorTokenType.class, Integer.class,
-                    LEFT_PAREN, 19, LEFT_BRACKET, 19
+                    LEFT_PAREN, 29,
+                    LEFT_BRACKET, 29
             );
 
-    static boolean isPostfix(AviatorToken op) {
-        return POSTFIX_OPERATOR_BINDING_POWER.containsKey(op.getType());
+    private BindingPower() {
     }
 
-    static boolean isInfix(AviatorToken op) {
-        return INFIX_OPERATOR_LEFT_BINDING_POWER.containsKey(op.getType());
+    static boolean isPostfix(AviatorToken token) {
+        return POSTFIX.containsKey(token.getType());
     }
 
-    static int infixRight(AviatorToken op) {
-        return INFIX_OPERATOR_RIGHT_BINDING_POWER.get(op.getType());
+    static boolean isInfix(AviatorToken token) {
+        return INFIX_LEFT.containsKey(token.getType());
     }
 
-    static int infixLeft(AviatorToken op) {
-        return INFIX_OPERATOR_LEFT_BINDING_POWER.get(op.getType());
+    static int infixRight(AviatorToken token) {
+        return INFIX_RIGHT.get(token.getType());
     }
 
-    static int prefix(AviatorToken op) {
-        return PREFIX_OPERATOR_BINDING_POWER.get(op.getType());
+    static int infixLeft(AviatorToken token) {
+        return INFIX_LEFT.get(token.getType());
     }
 
-    static Integer postfix(AviatorToken op) {
-        return POSTFIX_OPERATOR_BINDING_POWER.get(op.getType());
+    static int prefix(AviatorToken token) {
+        return PREFIX.get(token.getType());
+    }
+
+    static int postfix(AviatorToken token) {
+        return POSTFIX.get(token.getType());
     }
 }
